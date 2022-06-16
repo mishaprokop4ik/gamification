@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:latest
+    container_name: acheer_db
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    volumes:
+      - $HOME/acheer-postgres-data:/var/lib/postgresql/data
+#  acheer:
+#    image: miprokop/acheer:v1
+#    container_name: acheer_server
+#    restart: always
+#    ports:
+#      - 8080:8080

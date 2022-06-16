@@ -1,0 +1,9 @@
+port: 8082
+
+database:
+  username: postgres
+  password: rootroot
+  host: localhost
+  port: 5436
+  dbname: postgres
+  sslmode: disable
