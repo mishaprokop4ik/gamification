@@ -1,9 +1,15 @@
 package main
 
 import (
+	"context"
 	"github.com/miprokop/fication/configs"
+	http_server "github.com/miprokop/fication/internal/http-server"
+	"github.com/miprokop/fication/internal/http-server/handlers"
+	"github.com/miprokop/fication/internal/persistence/postgres"
+	"github.com/miprokop/fication/internal/services"
 	"github.com/spf13/viper"
 	"log"
+	"sync"
 )
 
 func main() {
@@ -11,7 +17,7 @@ func main() {
 		log.Fatalf("error in config init: %s", err)
 	}
 
-	db, err := repo.NewPostgresRepository(configs.Config{
+	db, err := postgres.New(context.Background(), &sync.WaitGroup{}, &configs.Config{
 		Host:     viper.GetString("database.host"),
 		Port:     viper.GetString("database.port"),
 		Username: viper.GetString("database.username"),
@@ -23,12 +29,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("error in database init: %s", err)
 	}
-	rep := repo.NewRepository(db)
-	services := service.NewService(rep)
-	handlers := router.NewHandler(services)
+	rep := postgres.NewRepository(db)
+	s := services.NewService(rep)
+	h := handlers.NewHandler(s)
 
-	srv := new(server.Server)
-	if err := srv.Run(viper.GetString("port"), handlers.InitHandlers()); err != nil {
+	srv := new(http_server.Server)
+	if err := srv.Run(viper.GetString("port"), h.InitRoutes()); err != nil {
 		log.Fatalf("err %v in running server", err)
 	}
 }

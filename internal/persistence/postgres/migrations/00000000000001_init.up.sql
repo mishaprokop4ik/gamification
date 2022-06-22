@@ -11,8 +11,7 @@ CREATE TABLE organizations (
                                id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
                                name VARCHAR,
                                website_url VARCHAR NOT NULL,
-                               image VARCHAR NOT NULL,
-                               type VARCHAR NOT NULL
+                               image VARCHAR NOT NULL
 );
 
 CREATE TABLE organizations_types (
@@ -80,7 +79,6 @@ CREATE TABLE permissions (
                              position_id UUID DEFAULT uuid_generate_v4() NOT NULL,
                              permission VARCHAR(50) NOT NULL,
                              granted_by UUID,
-                             granted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                              PRIMARY KEY(position_id, permission),
                              CONSTRAINT fk_position FOREIGN KEY(position_id) REFERENCES position(id)
                                  ON DELETE SET NULL ON UPDATE CASCADE
@@ -106,7 +104,7 @@ CREATE TABLE event(
 CREATE TYPE status AS ENUM ('accepted', 'none', 'declared');
 CREATE TYPE role AS ENUM ('admin', 'default', 'creator');
 
-CREATE TABLE staff_event (
+CREATE TABLE staff_events (
     id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id uuid,
     event_id uuid,
@@ -169,7 +167,7 @@ CREATE TABLE prize (
                             created_by UUID NOT NULL,
                             count INTEGER,
                             current_count INTEGER DEFAULT 0,
-                            file_url VARCHAR,
+                            data VARCHAR,
                             description VARCHAR NOT NULL,
                             CONSTRAINT fk_step FOREIGN KEY(step_id) REFERENCES step(id)
                                 ON DELETE CASCADE ON UPDATE CASCADE,
