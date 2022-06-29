@@ -11,7 +11,30 @@ import (
 
 func (h *Handler) CreateOrganizationType(c *gin.Context) {
 	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
 
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasPermission(models.OrganizationTypeCreate) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
 	var orgType *models.OrganizationType
 
 	if err := c.Bind(&orgType); err != nil {
@@ -21,7 +44,7 @@ func (h *Handler) CreateOrganizationType(c *gin.Context) {
 
 	orgType.ID = uuid.New()
 
-	err := h.Service.Organization.CreateOrganizationType(ctx, orgType)
+	err = h.Service.Organization.CreateOrganizationType(ctx, orgType)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model org type: %s", err).Error())
 		return
@@ -33,6 +56,30 @@ func (h *Handler) CreateOrganizationType(c *gin.Context) {
 
 func (h *Handler) GetOrganizationTypes(c *gin.Context) {
 	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
+
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasPermission(models.OrganizationTypeGetAll) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
 	organizationTypes, err := h.Service.Organization.GetOrganizationTypes(ctx)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -46,6 +93,30 @@ func (h *Handler) GetOrganizationTypes(c *gin.Context) {
 
 func (h *Handler) GetOrganizationTypeByID(c *gin.Context) {
 	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
+
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasPermission(models.OrganizationTypeGetByID) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in getting org type by id: %s", err).Error())
@@ -64,6 +135,30 @@ func (h *Handler) GetOrganizationTypeByID(c *gin.Context) {
 
 func (h *Handler) DeleteOrganizationType(c *gin.Context) {
 	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
+
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasPermission(models.OrganizationTypeDelete) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in deleting org: %s", err).Error())
@@ -82,9 +177,33 @@ func (h *Handler) DeleteOrganizationType(c *gin.Context) {
 
 func (h *Handler) UpdateOrganizationType(c *gin.Context) {
 	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
+
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasPermission(models.OrganizationTypeUpdate) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in updating org: %s", err).Error())
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in updating orgtype: %s", err).Error())
 		return
 	}
 

@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"strings"
@@ -38,6 +40,7 @@ func (h *Handler) identity(c *gin.Context) {
 }
 
 func (h *Handler) signUp(c *gin.Context) {
+	ctx := context.Background()
 	reqData := []byte(c.PostForm("json"))
 	var input models.StaffSignUp
 
@@ -50,6 +53,7 @@ func (h *Handler) signUp(c *gin.Context) {
 		dst := fmt.Sprintf("%s/%s", imagePath, file.Filename)
 		err := c.SaveUploadedFile(file, dst)
 		if err != nil {
+			log.Error(err)
 			_ = os.Remove(dst)
 			newErrorResponse(c, http.StatusInternalServerError, err.Error())
 			return
@@ -63,11 +67,34 @@ func (h *Handler) signUp(c *gin.Context) {
 				input.TextColor, "input.BackgroundColor"))
 		return
 	}
+	if input.TeamID == (uuid.UUID{}) && input.OrganizationID != (uuid.UUID{}) {
+		defaultTeam, err := h.Service.Team.GetTeamByName(ctx, input.OrganizationID, models.DefaultTeamName)
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create defaul team: %s", err).Error())
+			return
+		}
+		input.TeamID = defaultTeam.ID
+	}
+
+	if input.PositionID == (uuid.UUID{}) && input.OrganizationID != (uuid.UUID{}) {
+		positions, err := h.Service.Staff.GetAllPositions(ctx, input.OrganizationID)
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not get positions: %s", err).Error())
+			return
+		}
+		for _, p := range positions {
+			if p.Name == "none" {
+				input.PositionID = p.ID
+			}
+		}
+	}
+
 	if input.OrganizationID == (uuid.UUID{}) {
 		input.OrganizationID = models.DefaultOrganization.ID
 		input.PositionID = models.DefaultPosition.ID
 		input.TeamID = models.DefaultTeam.ID
 	}
+
 	input.ID = uuid.New()
 	input.TextColor = "#000000"
 	input.BackgroundColor = "#fffff"

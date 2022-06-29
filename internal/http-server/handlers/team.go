@@ -11,7 +11,30 @@ import (
 
 func (h *Handler) CreateTeam(c *gin.Context) {
 	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
 
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasOneOfPermissions(models.TeamCreate, models.OrganizationUpdate) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
 	var team *models.Team
 
 	if err := c.Bind(&team); err != nil {
@@ -21,7 +44,7 @@ func (h *Handler) CreateTeam(c *gin.Context) {
 
 	team.ID = uuid.New()
 
-	err := h.Service.Team.CreateTeam(ctx, team)
+	err = h.Service.Team.CreateTeam(ctx, team)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())
 		return
@@ -33,7 +56,30 @@ func (h *Handler) CreateTeam(c *gin.Context) {
 
 func (h *Handler) GetTeamsByOrganizationID(c *gin.Context) {
 	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
 
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasPermission(models.TeamGetAll) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in teams by org: %s", err).Error())
@@ -52,7 +98,30 @@ func (h *Handler) GetTeamsByOrganizationID(c *gin.Context) {
 
 func (h *Handler) GetTeamsByEventID(c *gin.Context) {
 	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
 
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasPermission(models.TeamGetAll) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in teams by org: %s", err).Error())
@@ -71,7 +140,30 @@ func (h *Handler) GetTeamsByEventID(c *gin.Context) {
 
 func (h *Handler) GetTeamByID(c *gin.Context) {
 	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
 
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasPermission(models.TeamGetByID) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in teams by org: %s", err).Error())
@@ -90,6 +182,32 @@ func (h *Handler) GetTeamByID(c *gin.Context) {
 
 func (h *Handler) UpdateTeam(c *gin.Context) {
 	ctx := context.Background()
+
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
+
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasOneOfPermissions(models.TeamUpdate, models.OrganizationUpdate) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
+
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in updating team: %s", err).Error())
@@ -117,7 +235,30 @@ func (h *Handler) UpdateTeam(c *gin.Context) {
 
 func (h *Handler) DeleteTeamByID(c *gin.Context) {
 	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
 
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasOneOfPermissions(models.TeamDelete, models.OrganizationDelete) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in teams deletion: %s", err).Error())

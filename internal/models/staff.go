@@ -28,15 +28,15 @@ func (h *HexColor) IsHex() bool {
 type Status string
 
 type StaffEvents struct {
-	bun.BaseModel `bun:"table:staff_events,alias:s_e"`
+	bun.BaseModel `bun:"table:staff_events,alias:staff_events"`
 
-	ID        uuid.UUID `bun:",pk"`
-	StaffID   uuid.UUID `json:"staff_id" bun:"user_id"`
-	Staff     *Staff    `bun:"rel:belongs-to,join:user_id=id"`
-	EventID   uuid.UUID `json:"event_id" bun:"event_id"`
-	Event     *Event    `bun:"rel:belongs-to,join:event_id=id"`
-	Status    Status    `json:"status"`
-	StaffRole string    `json:"staff_role" bun:"user_role"`
+	ID        uuid.UUID      `bun:",pk" json:"id"`
+	StaffID   uuid.UUID      `json:"staff_id" bun:"user_id"`
+	Staff     *Staff         `json:"staff" bun:"rel:belongs-to,join:user_id=id"`
+	EventID   uuid.UUID      `json:"event_id" bun:"event_id"`
+	Event     *Event         `json:"event" bun:"rel:belongs-to,join:event_id=id"`
+	Status    InviteStatus   `json:"status"`
+	StaffRole EventStaffRole `json:"staff_role" bun:"user_role"`
 }
 
 type StaffLogin struct {
@@ -48,9 +48,20 @@ type StaffImage struct {
 	bun.BaseModel `bun:"table:staff_image,alias:staff_image"`
 
 	ID        uuid.UUID `json:"id"`
-	UserID    uuid.UUID `json:"userID"`
-	Staff     Staff     `bun:"rel:belongs-to,join:user_id=id" json:"staff"`
+	UserID    uuid.UUID `json:"-"`
+	Staff     Staff     `json:"-" bun:"rel:belongs-to,join:user_id=id"`
 	ImagePath string    `json:"image_path"`
+}
+
+type StaffID struct {
+	StaffID uuid.UUID `json:"staff_id"`
+}
+
+type StaffInsertion struct {
+	ID             uuid.UUID `json:"id" bun:",pk"`
+	TeamID         uuid.UUID `json:"team_id"`
+	PositionID     uuid.UUID `json:"position_id"`
+	OrganizationID uuid.UUID `json:"organization_id"`
 }
 
 type Staff struct {
@@ -60,7 +71,7 @@ type Staff struct {
 	FirstName       string         `json:"first_name"`
 	LastName        string         `json:"last_name"`
 	Email           string         `json:"email"`
-	Password        string         `json:"password"`
+	Password        string         `json:"-"`
 	Sex             Sex            `json:"sex"`
 	AdditionalInfo  string         `json:"additional_info"`
 	TeamID          uuid.UUID      `json:"team_id"`
@@ -102,13 +113,67 @@ const (
 	EventDelete  PermissionName = "event-delete"
 	EventGetByID PermissionName = "event-get-by-id"
 	EventGetAll  PermissionName = "event-get-all"
+
+	TeamCreate  PermissionName = "team-create"
+	TeamUpdate  PermissionName = "team-update"
+	TeamDelete  PermissionName = "team-delete"
+	TeamGetByID PermissionName = "team-get-by-id"
+	TeamGetAll  PermissionName = "team-get-all"
+
+	StepCreate  PermissionName = "step-create"
+	StepUpdate  PermissionName = "step-update"
+	StepDelete  PermissionName = "step-delete"
+	StepGetByID PermissionName = "step-get-by-id"
+	StepGetAll  PermissionName = "step-get-all"
+
+	OrganizationTypeCreate  PermissionName = "organization-type-create"
+	OrganizationTypeUpdate  PermissionName = "organization-type-update"
+	OrganizationTypeDelete  PermissionName = "organization-type-delete"
+	OrganizationTypeGetByID PermissionName = "organization-type-get-by-id"
+	OrganizationTypeGetAll  PermissionName = "organization-type-get-all"
+
+	PrizeCreate   PermissionName = "prize-create"
+	PrizeGive     PermissionName = "prize-give"
+	PrizeUpdate   PermissionName = "prize-update"
+	PrizeDelete   PermissionName = "prize-delete"
+	PrizeGetByID  PermissionName = "prize-get-by-id"
+	PrizeGetAll   PermissionName = "prize-get-all"
+	PrizeStaffAll PermissionName = "prize-staff-get-all"
+
+	PositionCreate  PermissionName = "position-create"
+	PositionUpdate  PermissionName = "position-update"
+	PositionDelete  PermissionName = "position-delete"
+	PositionGetByID PermissionName = "position-get-by-id"
+	PositionGetAll  PermissionName = "position-get-all"
+	PositionGive    PermissionName = "position-give"
+
+	StaffCreate         PermissionName = "staff-create"
+	StaffUpdate         PermissionName = "staff-update"
+	StaffDelete         PermissionName = "staff-delete"
+	StaffSelfGet        PermissionName = "staff-self-get"
+	StaffSelfUpdate     PermissionName = "staff-self-update"
+	StaffGetSelfInvites PermissionName = "staff-self-invites"
+	StaffGetInvites     PermissionName = "staff-invites"
+	StaffSelfDelete     PermissionName = "staff-self-delete"
+	StaffGetByID        PermissionName = "staff-get-by-id"
+	StaffGetAll         PermissionName = "staff-get-all"
+
+	OrganizationCreate    PermissionName = "organization-create"
+	OrganizationUpdate    PermissionName = "organization-update"
+	OrganizationEvents    PermissionName = "organization-events"
+	OrganizationAddStaff  PermissionName = "organization-add-staff"
+	OrganizationDelete    PermissionName = "organization-delete"
+	OrganizationGetByID   PermissionName = "organization-get-by-id"
+	OrganizationGetAll    PermissionName = "organization-get-all"
+	StaffByOrganizationID PermissionName = "organization-staff"
 )
 
 type Permission struct {
-	PositionID uuid.UUID      `json:"position_id"`
-	Permission PermissionName `json:"permission"`
-	GrantedBy  uuid.UUID      `json:"granted_by"`
-	Position   *Position      `bun:"rel:belongs-to,join:position_id=id"`
+	bun.BaseModel `bun:"table:permissions,alias:permissions"`
+	PositionID    uuid.UUID      `json:"position_id"`
+	Permission    PermissionName `json:"permission"`
+	GrantedBy     uuid.UUID      `json:"granted_by"`
+	Position      *Position      `bun:"rel:belongs-to,join:position_id=id"`
 }
 
 func (u *Staff) HasPermission(perm PermissionName) bool {

@@ -12,43 +12,159 @@ type EventRepo struct {
 	ctx context.Context
 }
 
+func (e *EventRepo) GetInvites(ctx context.Context, staffID uuid.UUID) ([]*models.StaffEvents, error) {
+	invites := new([]*models.StaffEvents)
+	err := e.DB.NewSelect().Model(invites).Where("user_id = ?", staffID).Relation("Event").Scan(ctx)
+	return *invites, err
+}
+
+func (e *EventRepo) GetStaffScore(ctx context.Context, eventID, staffID uuid.UUID) (models.StaffScore, error) {
+	var score models.StaffScore
+	steps := new([]*models.Step)
+	err := e.DB.NewSelect().Model(steps).Where("event_id = ?", eventID).Scan(ctx)
+	if err != nil {
+		return models.StaffScore{}, err
+	}
+	stepsIDs := make([]uuid.UUID, len(*steps))
+	for i := range *steps {
+		stepsIDs[i] = (*steps)[i].ID
+	}
+	stepsStaff := new([]*models.StepStaff)
+	err = e.DB.NewSelect().Model(stepsStaff).
+		Where("user_id = ?", staffID).Where("step_id IN (?)", bun.In(stepsIDs)).Scan(ctx)
+	if err != nil {
+		return models.StaffScore{}, err
+	}
+	for i := range *stepsStaff {
+		score.Score += int((*stepsStaff)[i].Score)
+	}
+
+	return score, nil
+}
+
+func (e *EventRepo) AnswerInvitation(ctx context.Context, events models.StaffEvents) error {
+	_, err := e.DB.NewUpdate().Model(&events).OmitZero().
+		Where("event_id = ?", events.EventID).Where("user_id = ?", events.StaffID).Exec(ctx)
+	return err
+}
+
+func (e *EventRepo) AssignStaff(ctx context.Context, events models.StaffEvents) error {
+	_, err := e.DB.NewInsert().Model(&events).Exec(ctx)
+	return err
+}
+
 func NewEventRepo(ctx context.Context, DB *bun.DB) *EventRepo {
 	return &EventRepo{DB: DB, ctx: ctx}
 }
 
-func (e *EventRepo) CreateEvent(ctx context.Context, step *models.Event) error {
-	//TODO implement me
-	panic("implement me")
+func (e *EventRepo) CreateEvent(ctx context.Context, event *models.Event) error {
+	tx, err := e.DB.DB.Begin()
+	if err != nil {
+		return err
+	}
+	_, err = e.DB.NewInsert().Model(event).Exec(ctx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	if len(event.StaffEvents) != 0 {
+		_, err = e.DB.NewInsert().
+			Model(&event.StaffEvents).Exec(ctx)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit()
 }
 
 func (e *EventRepo) GetEvent(ctx context.Context, id uuid.UUID) (*models.Event, error) {
-	//TODO implement me
-	panic("implement me")
+	event := new(models.Event)
+	err := e.DB.NewSelect().
+		Model(event).
+		Relation("Steps").
+		Where("event.id = ?", id).
+		Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+	staffEvents := new([]*models.StaffEvents)
+	err = e.DB.NewSelect().
+		Model(staffEvents).
+		Where("event_id = ?", id).
+		Scan(ctx)
+	event.StaffEvents = *staffEvents
+	return event, err
 }
 
-func (e *EventRepo) GetEventsByOrgID(ctx context.Context, orgID uuid.UUID) ([]*models.Step, error) {
-	//TODO implement me
-	panic("implement me")
+func (e *EventRepo) GetEventsByTeamID(ctx context.Context, teamID uuid.UUID) ([]*models.Event, error) {
+	events := new([]*models.Event)
+	staff := new([]*models.Staff)
+	staffEvents := new([]*models.StaffEvents)
+	err := e.DB.NewSelect().Model(staff).Where("team_id = ?", teamID).Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]uuid.UUID, len(*staff))
+	for i := range *staff {
+		ids[i] = (*staff)[i].ID
+	}
+	err = e.DB.NewSelect().Model(staffEvents).Where("user_id IN (?)", bun.In(ids)).Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ids = nil
+	ids = make([]uuid.UUID, len(*staffEvents))
+	for i := range *staffEvents {
+		ids[i] = (*staffEvents)[i].EventID
+	}
+	err = e.DB.NewSelect().Model(events).Where("id IN (?)", bun.In(ids)).Scan(ctx)
+	return *events, err
 }
 
-func (e *EventRepo) GetEventsByCommandID(ctx context.Context, commandID uuid.UUID) ([]*models.Step, error) {
-	//TODO implement me
-	panic("implement me")
+func (e *EventRepo) GetEventsByCommandID(ctx context.Context, commandID uuid.UUID) ([]*models.Event, error) {
+	staff := new([]*models.Staff)
+	err := e.DB.NewSelect().Model(staff).Where("team_id = ?", commandID).Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+	staffIDs := make([]uuid.UUID, len(*staff))
+	for i := range *staff {
+		staffIDs[i] = (*staff)[i].ID
+	}
+	events := new([]*models.Event)
+	err = e.DB.NewSelect().Model(events).Relation("StaffEvents").
+		Where("staff_events.user_id IN (?)", bun.In(staffIDs)).Scan(ctx)
+	return *events, nil
 }
 
 func (e *EventRepo) DeleteEvent(ctx context.Context, id uuid.UUID) error {
-	//TODO implement me
-	panic("implement me")
+	_, err := e.DB.NewUpdate().OmitZero().Model(&models.Event{}).Where("id = ?", id).Exec(ctx)
+	return err
 }
 
 func (e *EventRepo) UpdateEvent(ctx context.Context, step *models.Event) error {
-	//TODO implement me
-	panic("implement me")
+	_, err := e.DB.NewUpdate().OmitZero().Model(step).Where("id = ?", step.ID).Exec(ctx)
+	return err
 }
 
-func (e *EventRepo) GetStaffsEvents(ctx context.Context, id uuid.UUID) ([]*models.Event, error) {
-	var events = new([]*models.Event)
+func (e *EventRepo) GetStaffsEvents(ctx context.Context, id uuid.UUID, role string) ([]*models.Event, error) {
+	var staffEvents = new([]*models.StaffEvents)
 
-	err := e.DB.NewSelect().Model(events).Relation("StaffEvents").Where("s_e.user_id = ?", id).Scan(ctx)
+	err := e.DB.NewSelect().Model(staffEvents).
+		Where("user_id = ?", id).
+		Where("user_role = ?", role).
+		Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]uuid.UUID, len(*staffEvents))
+	for i := range *staffEvents {
+		ids[i] = (*staffEvents)[i].EventID
+	}
+	events := new([]*models.Event)
+	err = e.DB.NewSelect().Model(events).
+		Where("id IN (?)", bun.In(ids)).
+		Scan(ctx)
 	return *events, err
 }

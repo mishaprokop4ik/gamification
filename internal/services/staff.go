@@ -13,6 +13,23 @@ type StaffService struct {
 	ctx  context.Context
 }
 
+func (s *StaffService) RemovePermissionsFromPosition(ctx context.Context, permissions models.Permissions) error {
+	for _, p := range permissions.Permissions {
+		p := p
+		return s.repo.RemovePermissionsFromPosition(ctx, &p)
+	}
+	return nil
+}
+
+func (s *StaffService) RemoveFromPosition(ctx context.Context, userID uuid.UUID) error {
+	staff := models.Staff{ID: userID}
+	return s.repo.RemoveFromPosition(ctx, &staff)
+}
+
+func (s *StaffService) GetDefaultPosition(ctx context.Context, orgID uuid.UUID) (models.Position, error) {
+	return s.repo.GetDefaultPosition(ctx, orgID)
+}
+
 func (s *StaffService) UploadImage(ctx context.Context, image models.StaffImage) error {
 	return s.repo.SaveFile(ctx, image)
 }
@@ -58,43 +75,39 @@ func (s *StaffService) SetStaffRole(ctx context.Context, role models.StaffRole) 
 }
 
 func (s *StaffService) GetInvites(ctx context.Context, id uuid.UUID) ([]models.StaffEvents, error) {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.GetInvites(ctx, id)
 }
 
 func (s *StaffService) GetStaffPrizes(ctx context.Context, id uuid.UUID) ([]models.Prize, error) {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.GetStaffPrizes(ctx, id)
 }
 
 func (s *StaffService) GetPosition(ctx context.Context, id uuid.UUID) (*models.Position, error) {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.GetRole(ctx, id)
 }
 
 func (s *StaffService) GetAllPositions(ctx context.Context, orgID uuid.UUID) ([]models.Position, error) {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.GetAllPositions(ctx, orgID)
 }
 
 func (s *StaffService) CreatePosition(ctx context.Context, position *models.Position) error {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.CreatePosition(ctx, position)
 }
 
 func (s *StaffService) UpdatePosition(ctx context.Context, position *models.Position) error {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.UpdatePosition(ctx, position)
 }
 
 func (s *StaffService) DeletePosition(ctx context.Context, id uuid.UUID) error {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.DeletePosition(ctx, id)
 }
 
 func (s *StaffService) AssignPosition(ctx context.Context, userID, positionID uuid.UUID) error {
-	//TODO implement me
-	panic("implement me")
+	staff := models.Staff{
+		ID:         userID,
+		PositionID: positionID,
+	}
+	return s.repo.AssignPosition(ctx, &staff)
 }
 
 func (s *StaffService) GrantPermission(ctx context.Context, granterID, positionID uuid.UUID, perm models.Permission) error {

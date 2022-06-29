@@ -5,8 +5,10 @@ import (
 	"github.com/uptrace/bun"
 )
 
+const DefaultTeamName = "none"
+
 var DefaultTeam = Team{
-	Name:        "none",
+	Name:        DefaultTeamName,
 	Description: "",
 }
 

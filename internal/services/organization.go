@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
 	"github.com/miprokop/fication/internal/persistence/postgres"
@@ -20,20 +21,45 @@ func (o *OrganizationService) GetOrganization(ctx context.Context, id uuid.UUID)
 	return o.repo.GetOrganization(ctx, id)
 }
 
-func (o *OrganizationService) CreateOrganization(ctx context.Context, org *models.Organization) error {
-	return o.repo.CreateOrganization(ctx, org)
+func (o *OrganizationService) CreateOrganization(ctx context.Context, org *models.Organization, userID uuid.UUID) error {
+	return o.repo.CreateOrganization(ctx, org, userID)
 }
 
 func (o *OrganizationService) UpdateOrganization(ctx context.Context, org *models.Organization) error {
 	return o.repo.UpdateOrganization(ctx, org)
 }
 
-func (o *OrganizationService) AddUsersToOrg(ctx context.Context, orgID uuid.UUID, userIDs []uuid.UUID) error {
-	for i := 0; i < len(userIDs); i++ {
-		staff := &models.Staff{
-			ID:             userIDs[i],
-			OrganizationID: orgID,
+func (o *OrganizationService) AddUsersToOrg(ctx context.Context, orgID uuid.UUID, users []*models.StaffInsertion) error {
+	org, err := o.repo.GetOrganization(ctx, orgID)
+	if err != nil {
+		return err
+	}
+	for i := 0; i < len(users); i++ {
+		var hasPosition bool
+		for j := 0; j < len(org.Positions); j++ {
+			if org.Positions[j].ID == users[i].PositionID {
+				hasPosition = true
+			}
 		}
+		if !hasPosition {
+			return fmt.Errorf("no such position in this org")
+		}
+		var hasTeam bool
+		for j := 0; j < len(org.Teams); j++ {
+			if org.Teams[j].ID == users[i].TeamID {
+				hasTeam = true
+			}
+		}
+		if !hasTeam {
+			return fmt.Errorf("no such team in this org")
+		}
+		staff := &models.Staff{
+			ID:             users[i].ID,
+			OrganizationID: orgID,
+			PositionID:     users[i].PositionID,
+			TeamID:         users[i].TeamID,
+		}
+
 		if err := o.repo.AddUsersToOrg(ctx, staff); err != nil {
 			return err
 		}

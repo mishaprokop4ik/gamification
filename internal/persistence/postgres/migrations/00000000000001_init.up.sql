@@ -42,6 +42,7 @@ CREATE TABLE position(
                          id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
                          company_id uuid,
                          name VARCHAR(40),
+                         UNIQUE(company_id, name),
                          CONSTRAINT fk_company FOREIGN KEY(company_id) REFERENCES organizations(id)
                              ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -53,7 +54,7 @@ CREATE TABLE staff (
                        email VARCHAR NOT NULL,
                        password VARCHAR NOT NULL,
                        sex VARCHAR NOT NULL,
-                        additional_info VARCHAR,
+                       additional_info VARCHAR,
                        company_id UUID NOT NULL,
                        team_id UUID,
                        position_id uuid,
@@ -76,7 +77,7 @@ CREATE TABLE staff_image (
 );
 
 CREATE TABLE permissions (
-                             position_id UUID DEFAULT uuid_generate_v4() NOT NULL,
+                             position_id UUID DEFAULT uuid_generate_v4(),
                              permission VARCHAR(50) NOT NULL,
                              granted_by UUID,
                              PRIMARY KEY(position_id, permission),
@@ -125,6 +126,7 @@ CREATE TABLE step (
                       creation_date DATE DEFAULT CURRENT_DATE NOT NULL,
                       task VARCHAR NOT NULL,
                       step_status time_status DEFAULT 'process',
+                      level INTEGER DEFAULT 1,
                       description VARCHAR NOT NULL,
                       end_date TIMESTAMP,
                       CONSTRAINT fk_event FOREIGN KEY(event_id) REFERENCES event(id)
@@ -133,22 +135,20 @@ CREATE TABLE step (
 
 CREATE TABLE step_image (
                             id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
-                            event_id uuid,
+                            step_id uuid,
                             image_url VARCHAR NOT NULL,
-                            creation_date DATE DEFAULT CURRENT_DATE NOT NULL,
-                            CONSTRAINT fk_event FOREIGN KEY(event_id) REFERENCES event(id)
+                            CONSTRAINT fk_event FOREIGN KEY(step_id) REFERENCES step(id)
                                 ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE staff_step (
                              id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
-                             user_id uuid,
+                             staff_id uuid,
                              step_id uuid,
                              accomplishment accomplishment DEFAULT 'process' NOT NULL,
                              score INTEGER NOT NULL DEFAULT 0,
                              start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                             step_level INTEGER DEFAULT 0,
-                             CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES staff(id)
+                             CONSTRAINT fk_staff FOREIGN KEY(staff_id) REFERENCES staff(id)
                                  ON DELETE CASCADE ON UPDATE CASCADE,
                              CONSTRAINT fk_step FOREIGN KEY(step_id) REFERENCES step(id)
                                  ON DELETE CASCADE ON UPDATE CASCADE
@@ -173,6 +173,17 @@ CREATE TABLE prize (
                                 ON DELETE CASCADE ON UPDATE CASCADE,
                             CONSTRAINT fk_staff FOREIGN KEY(created_by) REFERENCES staff(id)
                                 ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE staff_prizes (
+    id uuid NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+    staff_id uuid NOT NULL,
+    prize_id uuid NOT NULL,
+    get_in timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_staff FOREIGN KEY(staff_id) REFERENCES staff(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_prize FOREIGN KEY(prize_id) REFERENCES prize(id)
+        ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 END;

@@ -14,7 +14,13 @@ type Event struct {
 	EndDate        string         `json:"end_date"`
 	Description    string         `json:"description"`
 	ImagePath      string         `json:"image_path"`
+	EventStatus    string         `json:"event_status"`
+	EventType      string         `json:"event_type"`
 	OrganizationID uuid.UUID      `json:"organization_id"`
 	StaffEvents    []*StaffEvents `json:"staff" bun:"m2m:staff_events,join:Event=Staff"`
 	Steps          []*Step        `json:"steps" bun:"rel:has-many,join:id=event_id"`
+}
+
+type StaffScore struct {
+	Score int `json:"score"`
 }

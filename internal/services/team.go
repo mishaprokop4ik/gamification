@@ -12,6 +12,10 @@ type TeamService struct {
 	ctx  context.Context
 }
 
+func (t *TeamService) GetTeamByName(ctx context.Context, orgID uuid.UUID, name string) (*models.Team, error) {
+	return t.repo.GetTeamByName(ctx, orgID, name)
+}
+
 func (t *TeamService) CreateTeam(ctx context.Context, team *models.Team) error {
 	return t.repo.CreateTeam(ctx, team)
 }

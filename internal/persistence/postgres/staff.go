@@ -13,8 +13,26 @@ type StaffRepo struct {
 	ctx context.Context
 }
 
+func (s *StaffRepo) RemovePermissionsFromPosition(ctx context.Context, permission *models.Permission) error {
+	_, err := s.DB.NewDelete().Model(permission).
+		Where("position_id = ?", permission.PositionID).
+		Where("permission = ?", permission.Permission).Exec(ctx)
+	return err
+}
+
+func (s *StaffRepo) RemoveFromPosition(ctx context.Context, staff *models.Staff) error {
+	_, err := s.DB.NewUpdate().OmitZero().Model(staff).Where("id = ?", staff.ID).Set("position_id = DEFAULT").Exec(ctx)
+	return err
+}
+
+func (s *StaffRepo) GetDefaultPosition(ctx context.Context, orgID uuid.UUID) (models.Position, error) {
+	p := new(models.Position)
+	err := s.DB.NewSelect().Model(p).Where("company_id = ?", orgID).Where("name = ?", models.DefaultPositionName).Scan(ctx)
+	return *p, err
+}
+
 func (s *StaffRepo) SaveFile(ctx context.Context, image models.StaffImage) error {
-	_, err := s.DB.NewInsert().Model(image).Exec(ctx)
+	_, err := s.DB.NewInsert().Model(&image).Exec(ctx)
 	return err
 }
 
@@ -51,7 +69,7 @@ func (s *StaffRepo) GetStaffAuth(ctx context.Context, email, password string) (*
 
 func (s *StaffRepo) GetStaff(ctx context.Context, id uuid.UUID) (*models.Staff, error) {
 	var staff = new(models.Staff)
-
+	var permissions = new([]*models.Permission)
 	err := s.DB.NewSelect().Model(staff).
 		Relation("Position").
 		Relation("Team").
@@ -59,7 +77,13 @@ func (s *StaffRepo) GetStaff(ctx context.Context, id uuid.UUID) (*models.Staff, 
 		Relation("Images").
 		Where("staff.id = ?", id).
 		Scan(ctx)
-
+	if err != nil {
+		return nil, err
+	}
+	err = s.DB.NewSelect().Model(permissions).
+		Where("permissions.position_id = ?", staff.PositionID).
+		Scan(ctx)
+	staff.Position.Permissions = *permissions
 	return staff, err
 }
 
@@ -96,7 +120,7 @@ func (s *StaffRepo) DeleteStaff(ctx context.Context, id uuid.UUID) error {
 }
 
 func (s *StaffRepo) UpdateStaff(ctx context.Context, staff *models.Staff) error {
-	_, err := s.DB.NewUpdate().OmitZero().Model(staff).Where("id = ?", staff.ID).Exec(ctx)
+	_, err := s.DB.NewUpdate().OmitZero().Model(staff).WherePK().Exec(ctx)
 	return err
 }
 
@@ -106,43 +130,92 @@ func (s *StaffRepo) SetStaffRole(ctx context.Context, role models.StaffRole) err
 }
 
 func (s *StaffRepo) GetInvites(ctx context.Context, id uuid.UUID) ([]models.StaffEvents, error) {
-	//TODO implement me
-	panic("implement me")
+	invites := new([]models.StaffEvents)
+	err := s.DB.NewSelect().Model(invites).Where("user_id = ?", id).Scan(ctx)
+	return *invites, err
 }
 
 func (s *StaffRepo) GetStaffPrizes(ctx context.Context, id uuid.UUID) ([]models.Prize, error) {
-	//TODO implement me
-	panic("implement me")
+	var prizes = new([]models.Prize)
+	err := s.DB.NewSelect().Model(prizes).Relation("Staff").Where("staff.id = ?", id).Scan(ctx)
+	return *prizes, err
 }
 
 func (s *StaffRepo) GetRole(ctx context.Context, id uuid.UUID) (*models.Position, error) {
-	//TODO implement me
-	panic("implement me")
+	position := new(models.Position)
+	err := s.DB.NewSelect().Model(position).Relation("Permissions").Where("id = ?", id).Scan(ctx)
+	return position, err
 }
 
 func (s *StaffRepo) GetAllPositions(ctx context.Context, orgID uuid.UUID) ([]models.Position, error) {
-	//TODO implement me
-	panic("implement me")
+	var positions = new([]models.Position)
+	err := s.DB.NewSelect().Model(positions).Relation("Permissions").Where("company_id = ?", orgID).Scan(ctx)
+	return *positions, err
 }
 
 func (s *StaffRepo) CreatePosition(ctx context.Context, position *models.Position) error {
-	//TODO implement me
-	panic("implement me")
+	tx, err := s.DB.DB.Begin()
+	if err != nil {
+		return err
+	}
+	_, err = s.DB.NewInsert().Model(position).Exec(ctx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	if len(position.Permissions) != 0 {
+		_, err = s.DB.NewInsert().Model(&position.Permissions).Exec(ctx)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit()
 }
 
 func (s *StaffRepo) UpdatePosition(ctx context.Context, position *models.Position) error {
-	//TODO implement me
-	panic("implement me")
+	tx, err := s.DB.DB.Begin()
+	if err != nil {
+		return err
+	}
+	if len(position.Permissions) != 0 {
+		old := new(models.Position)
+		err = s.DB.NewSelect().Model(old).Relation("Permissions").Where("id = ?", position.ID).Scan(ctx)
+		if err != nil {
+			return err
+		}
+		for i := range position.Permissions {
+			var exist bool
+			for j := range old.Permissions {
+				if position.Permissions[i].Permission == old.Permissions[j].Permission {
+					exist = true
+				}
+			}
+			if !exist {
+				_, err = s.DB.NewInsert().Model(position.Permissions[i]).Exec(ctx)
+				if err != nil {
+					tx.Rollback()
+					return err
+				}
+			}
+		}
+	}
+	_, err = s.DB.NewUpdate().OmitZero().Model(position).Where("id = ?", position.ID).Exec(ctx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return err
 }
 
 func (s *StaffRepo) DeletePosition(ctx context.Context, id uuid.UUID) error {
-	//TODO implement me
-	panic("implement me")
+	_, err := s.DB.NewDelete().Model(&models.Position{}).Where("id = ?", id).Exec(ctx)
+	return err
 }
 
-func (s *StaffRepo) AssignPosition(ctx context.Context, userID, positionID uuid.UUID) error {
-	//TODO implement me
-	panic("implement me")
+func (s *StaffRepo) AssignPosition(ctx context.Context, staff *models.Staff) error {
+	_, err := s.DB.NewUpdate().Model(staff).OmitZero().Where("id = ?", staff.ID).Exec(ctx)
+	return err
 }
 
 func (s *StaffRepo) GrantPermission(ctx context.Context, granterID, positionID uuid.UUID, perm models.Permission) error {

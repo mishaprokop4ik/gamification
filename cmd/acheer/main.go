@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/miprokop/fication/configs"
-	http_server "github.com/miprokop/fication/internal/http-server"
+	server "github.com/miprokop/fication/internal/http-server"
 	"github.com/miprokop/fication/internal/http-server/handlers"
 	"github.com/miprokop/fication/internal/persistence/postgres"
 	"github.com/miprokop/fication/internal/services"
@@ -29,11 +29,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("error in database init: %s", err)
 	}
-	rep := postgres.NewRepository(db)
+	rep, err := postgres.NewRepository(db)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
 	s := services.NewService(rep)
 	h := handlers.NewHandler(s)
 
-	srv := new(http_server.Server)
+	srv := new(server.Server)
 	if err := srv.Run(viper.GetString("port"), h.InitRoutes()); err != nil {
 		log.Fatalf("err %v in running server", err)
 	}
