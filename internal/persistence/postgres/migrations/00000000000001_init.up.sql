@@ -58,6 +58,7 @@ CREATE TABLE staff (
                        company_id UUID NOT NULL,
                        team_id UUID,
                        position_id uuid,
+                       current_image varchar,
                        text_color VARCHAR NOT NULL DEFAULT '#000000',
                        background_color VARCHAR NOT NULL DEFAULT '#FFFFFF',
                        CONSTRAINT fk_company FOREIGN KEY(company_id) REFERENCES organizations(id)
@@ -95,10 +96,13 @@ CREATE TABLE event(
                          end_date DATE NOT NULL,
                          description VARCHAR NOT NULL,
                          image_path VARCHAR NOT NULL,
+                         created_by uuid,
                          event_status time_status DEFAULT 'process',
                          event_type access DEFAULT 'public' NOT NULL,
                          organization_id UUID NOT NULL,
                          CONSTRAINT fk_organization FOREIGN KEY(organization_id) REFERENCES organizations(id)
+                             ON DELETE CASCADE ON UPDATE CASCADE,
+                         CONSTRAINT fk_created_by FOREIGN KEY(created_by) REFERENCES staff(id)
                              ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -125,6 +129,7 @@ CREATE TABLE step (
                       name VARCHAR NOT NULL,
                       creation_date DATE DEFAULT CURRENT_DATE NOT NULL,
                       task VARCHAR NOT NULL,
+                      max_score INTEGER,
                       step_status time_status DEFAULT 'process',
                       level INTEGER DEFAULT 1,
                       description VARCHAR NOT NULL,
@@ -147,7 +152,9 @@ CREATE TABLE staff_step (
                              step_id uuid,
                              accomplishment accomplishment DEFAULT 'process' NOT NULL,
                              score INTEGER NOT NULL DEFAULT 0,
+                             max_score INTEGER NOT NULL DEFAULT 1,
                              start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             UNIQUE(staff_id, step_id),
                              CONSTRAINT fk_staff FOREIGN KEY(staff_id) REFERENCES staff(id)
                                  ON DELETE CASCADE ON UPDATE CASCADE,
                              CONSTRAINT fk_step FOREIGN KEY(step_id) REFERENCES step(id)

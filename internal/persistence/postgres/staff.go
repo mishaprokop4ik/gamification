@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
@@ -32,26 +33,37 @@ func (s *StaffRepo) GetDefaultPosition(ctx context.Context, orgID uuid.UUID) (mo
 }
 
 func (s *StaffRepo) SaveFile(ctx context.Context, image models.StaffImage) error {
-	_, err := s.DB.NewInsert().Model(&image).Exec(ctx)
+	tx, err := s.DB.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return err
+	}
+	_, err = tx.NewInsert().Model(&image).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = tx.NewUpdate().Model(&models.Staff{}).OmitZero().Set("current_image = ?", image.ImagePath).Exec(ctx)
+	if err != nil {
+		return err
+	}
 	return err
 }
 
 func (s *StaffRepo) CreateStaffUser(ctx context.Context, staff *models.StaffSignUp) (uuid.UUID, error) {
-	tx, err := s.DB.DB.Begin()
+	tx, err := s.DB.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		return [16]byte{}, err
+		return uuid.UUID{}, err
 	}
-	_, err = s.DB.NewInsert().Model(staff).Exec(ctx)
+	_, err = tx.NewInsert().Model(staff).Exec(ctx)
 	if err != nil {
 		tx.Rollback()
-		return [16]byte{}, fmt.Errorf("can not create staff; err: %s", err)
+		return uuid.UUID{}, fmt.Errorf("can not create staff; err: %s", err)
 	}
 	if staff.CurrentImage != "" {
 		var image = &models.StaffImage{
 			UserID:    staff.ID,
 			ImagePath: staff.CurrentImage,
 		}
-		_, err = s.DB.NewInsert().Model(image).Exec(ctx)
+		_, err = tx.NewInsert().Model(image).Exec(ctx)
 		if err != nil {
 			tx.Rollback()
 			return uuid.UUID{}, fmt.Errorf(`can not insert image in staff creation; err: %s`, err)
@@ -102,7 +114,8 @@ func (s *StaffRepo) GetStaffByStep(ctx context.Context, stepID uuid.UUID) ([]*mo
 	var staff = make([]*models.Staff, 0)
 	err := s.DB.NewSelect().
 		Model(&staff).
-		Join("JOIN staff_step ON staff.id = staff_step.user_id").
+		Distinct().
+		Join("JOIN staff_step ON staff.id = staff_step.staff_id").
 		Where("staff_step.step_id = ?", stepID).
 		Scan(ctx)
 
@@ -137,7 +150,16 @@ func (s *StaffRepo) GetInvites(ctx context.Context, id uuid.UUID) ([]models.Staf
 
 func (s *StaffRepo) GetStaffPrizes(ctx context.Context, id uuid.UUID) ([]models.Prize, error) {
 	var prizes = new([]models.Prize)
-	err := s.DB.NewSelect().Model(prizes).Relation("Staff").Where("staff.id = ?", id).Scan(ctx)
+	var staffPrizes = new([]models.StaffPrize)
+	err := s.DB.NewSelect().Model(staffPrizes).Where("staff_id = ?", id).Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]uuid.UUID, len(*staffPrizes))
+	for i := range *staffPrizes {
+		ids[i] = (*staffPrizes)[i].PrizeID
+	}
+	err = s.DB.NewSelect().Model(prizes).Where("id IN (?)", bun.In(ids)).Scan(ctx)
 	return *prizes, err
 }
 
@@ -154,17 +176,17 @@ func (s *StaffRepo) GetAllPositions(ctx context.Context, orgID uuid.UUID) ([]mod
 }
 
 func (s *StaffRepo) CreatePosition(ctx context.Context, position *models.Position) error {
-	tx, err := s.DB.DB.Begin()
+	tx, err := s.DB.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return err
 	}
-	_, err = s.DB.NewInsert().Model(position).Exec(ctx)
+	_, err = tx.NewInsert().Model(position).Exec(ctx)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 	if len(position.Permissions) != 0 {
-		_, err = s.DB.NewInsert().Model(&position.Permissions).Exec(ctx)
+		_, err = tx.NewInsert().Model(&position.Permissions).Exec(ctx)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -174,13 +196,13 @@ func (s *StaffRepo) CreatePosition(ctx context.Context, position *models.Positio
 }
 
 func (s *StaffRepo) UpdatePosition(ctx context.Context, position *models.Position) error {
-	tx, err := s.DB.DB.Begin()
+	tx, err := s.DB.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return err
 	}
 	if len(position.Permissions) != 0 {
 		old := new(models.Position)
-		err = s.DB.NewSelect().Model(old).Relation("Permissions").Where("id = ?", position.ID).Scan(ctx)
+		err = tx.NewSelect().Model(old).Relation("Permissions").Where("id = ?", position.ID).Scan(ctx)
 		if err != nil {
 			return err
 		}
@@ -192,7 +214,7 @@ func (s *StaffRepo) UpdatePosition(ctx context.Context, position *models.Positio
 				}
 			}
 			if !exist {
-				_, err = s.DB.NewInsert().Model(position.Permissions[i]).Exec(ctx)
+				_, err = tx.NewInsert().Model(position.Permissions[i]).Exec(ctx)
 				if err != nil {
 					tx.Rollback()
 					return err
@@ -200,7 +222,7 @@ func (s *StaffRepo) UpdatePosition(ctx context.Context, position *models.Positio
 			}
 		}
 	}
-	_, err = s.DB.NewUpdate().OmitZero().Model(position).Where("id = ?", position.ID).Exec(ctx)
+	_, err = tx.NewUpdate().OmitZero().Model(position).Where("id = ?", position.ID).Exec(ctx)
 	if err != nil {
 		tx.Rollback()
 		return err

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
 	"github.com/miprokop/fication/internal/persistence/postgres"
@@ -31,8 +32,40 @@ func (e *EventService) AssignStaff(ctx context.Context, events []models.StaffEve
 		if event.StaffRole == "" {
 			event.StaffRole = models.Default
 		}
+		oldEvent, err := e.repo.GetEvent(ctx, eventID)
+		if err != nil {
+			return err
+		}
+		if oldEvent.EventType != "public" {
+			switch oldEvent.EventType {
+			case "team-only":
+				createdBy, err := e.repo.GetStaff(ctx, oldEvent.CreatedByID)
+				if err != nil {
+					return err
+				}
+				exists, err := e.repo.IsStaffInTeam(ctx, event.StaffID, createdBy.TeamID)
+				if err != nil {
+					return err
+				}
+				if !exists {
+					return fmt.Errorf("staff with this id: %s; not in this team", event.StaffID)
+				}
+			case "private":
+				createdBy, err := e.repo.GetStaff(ctx, oldEvent.CreatedByID)
+				if err != nil {
+					return err
+				}
+				exists, err := e.repo.IsStaffInOrg(ctx, event.StaffID, createdBy.OrganizationID)
+				if err != nil {
+					return err
+				}
+				if !exists {
+					return fmt.Errorf("staff with this id: %s; not in this org", event.StaffID)
+				}
+			}
+		}
 		event.Status = models.InProgress
-		err := e.repo.AssignStaff(ctx, event)
+		err = e.repo.AssignStaff(ctx, event)
 		if err != nil {
 			return err
 		}

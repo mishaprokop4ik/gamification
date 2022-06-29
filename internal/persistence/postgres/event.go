@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
 	"github.com/uptrace/bun"
@@ -10,6 +11,24 @@ import (
 type EventRepo struct {
 	DB  *bun.DB
 	ctx context.Context
+}
+
+func (e *EventRepo) IsStaffInOrg(ctx context.Context, staffID, teamID uuid.UUID) (bool, error) {
+	exists, err := e.DB.NewSelect().Model((*models.Staff)(nil)).Where("organization_id = ?", teamID).Where("staff_id = ?", staffID).Exists(ctx)
+	return exists, err
+}
+
+func (e *EventRepo) GetStaff(ctx context.Context, id uuid.UUID) (*models.Staff, error) {
+	var staff = new(models.Staff)
+	err := e.DB.NewSelect().Model(staff).
+		Where("staff.id = ?", id).
+		Scan(ctx)
+	return staff, err
+}
+
+func (e *EventRepo) IsStaffInTeam(ctx context.Context, staffID, teamID uuid.UUID) (bool, error) {
+	exists, err := e.DB.NewSelect().Model((*models.Staff)(nil)).Where("team_id = ?", teamID).Where("staff_id = ?", staffID).Exists(ctx)
+	return exists, err
 }
 
 func (e *EventRepo) GetInvites(ctx context.Context, staffID uuid.UUID) ([]*models.StaffEvents, error) {
@@ -31,7 +50,7 @@ func (e *EventRepo) GetStaffScore(ctx context.Context, eventID, staffID uuid.UUI
 	}
 	stepsStaff := new([]*models.StepStaff)
 	err = e.DB.NewSelect().Model(stepsStaff).
-		Where("user_id = ?", staffID).Where("step_id IN (?)", bun.In(stepsIDs)).Scan(ctx)
+		Where("staff_id = ?", staffID).Where("step_id IN (?)", bun.In(stepsIDs)).Scan(ctx)
 	if err != nil {
 		return models.StaffScore{}, err
 	}
@@ -58,11 +77,11 @@ func NewEventRepo(ctx context.Context, DB *bun.DB) *EventRepo {
 }
 
 func (e *EventRepo) CreateEvent(ctx context.Context, event *models.Event) error {
-	tx, err := e.DB.DB.Begin()
+	tx, err := e.DB.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return err
 	}
-	_, err = e.DB.NewInsert().Model(event).Exec(ctx)
+	_, err = tx.NewInsert().Model(event).Exec(ctx)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -139,7 +158,7 @@ func (e *EventRepo) GetEventsByCommandID(ctx context.Context, commandID uuid.UUI
 }
 
 func (e *EventRepo) DeleteEvent(ctx context.Context, id uuid.UUID) error {
-	_, err := e.DB.NewUpdate().OmitZero().Model(&models.Event{}).Where("id = ?", id).Exec(ctx)
+	_, err := e.DB.NewDelete().Model(&models.Event{}).Where("id = ?", id).Exec(ctx)
 	return err
 }
 

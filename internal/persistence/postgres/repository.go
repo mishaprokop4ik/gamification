@@ -203,8 +203,11 @@ type Step interface {
 
 type Event interface {
 	GetInvites(ctx context.Context, staffID uuid.UUID) ([]*models.StaffEvents, error)
+	GetStaff(ctx context.Context, id uuid.UUID) (*models.Staff, error)
 	CreateEvent(ctx context.Context, event *models.Event) error
 	AnswerInvitation(ctx context.Context, events models.StaffEvents) error
+	IsStaffInTeam(ctx context.Context, staffID, teamID uuid.UUID) (bool, error)
+	IsStaffInOrg(ctx context.Context, staffID, teamID uuid.UUID) (bool, error)
 	GetStaffScore(ctx context.Context, eventID, staffID uuid.UUID) (models.StaffScore, error)
 	GetEvent(ctx context.Context, id uuid.UUID) (*models.Event, error)
 	GetEventsByTeamID(ctx context.Context, orgID uuid.UUID) ([]*models.Event, error)

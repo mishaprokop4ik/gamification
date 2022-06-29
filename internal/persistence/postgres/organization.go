@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
 	"github.com/uptrace/bun"
@@ -26,11 +27,11 @@ func (o *OrganizationRepo) GetOrganization(ctx context.Context, id uuid.UUID) (*
 }
 
 func (o *OrganizationRepo) CreateOrganization(ctx context.Context, org *models.Organization, userID uuid.UUID) error {
-	tx, err := o.DB.DB.Begin()
+	tx, err := o.DB.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return err
 	}
-	_, err = o.DB.NewInsert().Model(org).Exec(ctx)
+	_, err = tx.NewInsert().Model(org).Exec(ctx)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -38,7 +39,7 @@ func (o *OrganizationRepo) CreateOrganization(ctx context.Context, org *models.O
 	for i := range org.Positions {
 		org.Positions[i].CompanyID = org.ID
 	}
-	_, err = o.DB.NewInsert().Model(&org.Positions).Exec(ctx)
+	_, err = tx.NewInsert().Model(&org.Positions).Exec(ctx)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -47,7 +48,7 @@ func (o *OrganizationRepo) CreateOrganization(ctx context.Context, org *models.O
 		for _, p := range org.Positions[i].Permissions {
 			p.PositionID = org.Positions[i].ID
 			p.GrantedBy = userID
-			_, err = o.DB.NewInsert().Model(p).Exec(ctx)
+			_, err = tx.NewInsert().Model(p).Exec(ctx)
 			if err != nil {
 				tx.Rollback()
 				return err
@@ -57,7 +58,7 @@ func (o *OrganizationRepo) CreateOrganization(ctx context.Context, org *models.O
 	for i := range org.Teams {
 		org.Teams[i].OrganizationID = org.ID
 	}
-	_, err = o.DB.NewInsert().Model(&org.Teams).Exec(ctx)
+	_, err = tx.NewInsert().Model(&org.Teams).Exec(ctx)
 	var orgTypes = make([]models.OrganizationsTypes, len(org.Types))
 	for i := range org.Types {
 		orgTypes[i] = models.OrganizationsTypes{
@@ -66,7 +67,7 @@ func (o *OrganizationRepo) CreateOrganization(ctx context.Context, org *models.O
 			TypeID:         org.Types[i].ID,
 		}
 	}
-	_, err = o.DB.NewInsert().Model(&orgTypes).Exec(ctx)
+	_, err = tx.NewInsert().Model(&orgTypes).Exec(ctx)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -96,7 +97,7 @@ func (o *OrganizationRepo) DeleteOrganization(ctx context.Context, id uuid.UUID)
 
 func (o *OrganizationRepo) GetOrganizationEvents(ctx context.Context, id uuid.UUID) ([]*models.Event, error) {
 	var events []*models.Event
-	_, err := o.DB.NewSelect().Model(&events).Where("organization_id = ?", id).Exec(ctx)
+	err := o.DB.NewSelect().Model(&events).Where("organization_id = ?", id).Scan(ctx)
 	return events, err
 }
 

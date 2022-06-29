@@ -93,7 +93,8 @@ type Step interface {
 	DeleteStep(ctx context.Context, id uuid.UUID) error
 	GetStepPrizes(ctx context.Context, id uuid.UUID) ([]*models.Prize, error)
 	AssignStaff(ctx context.Context, staffID, stepID uuid.UUID) error
-	PassStaff(ctx context.Context, id uuid.UUID, status models.StepStatus) error
+	PassStaff(ctx context.Context, stepID, statusID uuid.UUID, status models.Accomplishment,
+		score uint) error
 	UpdateStep(ctx context.Context, step *models.Step) error
 }
 

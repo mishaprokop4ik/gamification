@@ -14,6 +14,8 @@ type Event struct {
 	EndDate        string         `json:"end_date"`
 	Description    string         `json:"description"`
 	ImagePath      string         `json:"image_path"`
+	CreatedByID    uuid.UUID      `json:"created_by_id" bun:"created_by"`
+	CreatedBy      *Staff         `json:"created_by" bun:"rel:belongs-to,join:created_by=id"`
 	EventStatus    string         `json:"event_status"`
 	EventType      string         `json:"event_type"`
 	OrganizationID uuid.UUID      `json:"organization_id"`

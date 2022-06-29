@@ -167,7 +167,7 @@ func (h *Handler) AssignStaffToEvent(c *gin.Context) {
 		return
 	}
 
-	if !staff.HasOneOfPermissions(models.EventCreate, models.EventUpdate) {
+	if !staff.HasOneOfPermissions(models.EventCreate, models.EventUpdate, models.StaffSelfUpdate) {
 		newErrorResponse(c, http.StatusForbidden,
 			"no access to this action")
 		return

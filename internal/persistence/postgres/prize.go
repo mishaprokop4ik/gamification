@@ -2,9 +2,11 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
 	"github.com/uptrace/bun"
+	"time"
 )
 
 type PrizeRepo struct {
@@ -20,8 +22,28 @@ func (p *PrizeRepo) GetPrizesByType(ctx context.Context, prizeType models.PrizeT
 }
 
 func (p *PrizeRepo) CreatePrize(ctx context.Context, prize *models.Prize) error {
-	_, err := p.DB.NewInsert().Model(prize).Exec(ctx)
-	return err
+	tx, err := p.DB.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.NewInsert().Model(prize).ExcludeColumn("creation_date").Exec(ctx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	creationTime, err := time.Parse(time.RFC3339, prize.CreationDate)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.NewUpdate().Model(&models.Prize{}).OmitZero().
+		Set("creation_date = ?", creationTime).Where("id = ?", prize.ID).Exec(ctx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
 }
 
 func (p *PrizeRepo) GetPrize(ctx context.Context, id uuid.UUID) (*models.Prize, error) {

@@ -56,16 +56,26 @@ func (s *StepService) AssignStaff(ctx context.Context, staffID, stepID uuid.UUID
 		ID:             uuid.New(),
 		StepID:         stepID,
 		StaffID:        staffID,
-		Accomplishment: models.Process,
+		Accomplishment: models.InProcess,
 		StartDate:      time.Now().Format(time.RFC3339),
 	}
 	return s.repo.AssignStaff(ctx, staffStep)
 }
 
-func (s *StepService) PassStaff(ctx context.Context, id uuid.UUID, status models.StepStatus) error {
+func (s *StepService) PassStaff(ctx context.Context, stepID, staffID uuid.UUID, status models.Accomplishment,
+	score uint) error {
+	step, err := s.repo.GetStep(ctx, stepID)
+	if err != nil {
+		return err
+	}
+	if step.MaxScore < score {
+		return fmt.Errorf("can not give staff score: %d; max: %d", score, step.MaxScore)
+	}
 	staffStep := models.StepStaff{
-		ID:             id,
+		StepID:         stepID,
+		StaffID:        staffID,
 		Accomplishment: status,
+		Score:          score,
 	}
 	return s.repo.PassStaff(ctx, staffStep)
 }

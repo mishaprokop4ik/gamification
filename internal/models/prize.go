@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
+	"time"
 )
 
 type PrizeType string
@@ -41,18 +42,37 @@ const (
 type Prize struct {
 	bun.BaseModel `bun:"table:prize,alias:prize"`
 
+	ID           uuid.UUID     `json:"id" bun:",pk"`
+	StepID       uuid.UUID     `json:"step_id"`
+	Step         *Step         `json:"step" bun:"rel:belongs-to,join:step_id=id"`
+	Name         string        `json:"name"`
+	CreationDate string        `json:"creation_date"`
+	PrizeType    PrizeType     `json:"type"`
+	PrizeStatus  PrizeStatus   `json:"status"`
+	CreatedBy    uuid.UUID     `json:"created_by"`
+	Staff        *Staff        `json:"staff" bun:"rel:belongs-to,join:created_by=id"`
+	Count        uint          `json:"count"`
+	CurrentCount uint          `json:"current_count" bun:"current_count"`
+	Data         string        `json:"data"`
+	Description  string        `json:"description"`
+	Prizes       []*StaffPrize `json:"prizes" bun:"m2m:staff_prizes,join:Staff=Prize"`
+}
+
+type PrizeRepo struct {
+	bun.BaseModel `bun:"table:prize,alias:prize"`
+
 	ID           uuid.UUID   `json:"id" bun:",pk"`
 	StepID       uuid.UUID   `json:"step_id"`
 	Step         *Step       `json:"step" bun:"rel:belongs-to,join:step_id=id"`
 	Name         string      `json:"name"`
-	CreationDate string      `json:"creation_date"`
-	PrizeType    PrizeType   `json:"prize_type"`
-	PrizeStatus  PrizeStatus `json:"prize_status"`
+	CreationDate time.Time   `json:"creation_date"`
+	PrizeType    PrizeType   `json:"type"`
+	PrizeStatus  PrizeStatus `json:"status"`
 	CreatedBy    uuid.UUID   `json:"created_by"`
 	Staff        *Staff      `json:"staff" bun:"rel:belongs-to,join:created_by=id"`
 	Count        uint        `json:"count"`
 	CurrentCount uint        `json:"current_count"`
-	FileURL      string      `json:"file_url"`
+	Data         string      `json:"data"`
 	Description  string      `json:"description"`
 }
 

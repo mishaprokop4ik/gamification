@@ -83,8 +83,9 @@ type Staff struct {
 	TextColor       HexColor       `json:"text_color"`
 	BackgroundColor HexColor       `json:"background_color"`
 	Events          []*StaffEvents `json:"events" bun:"m2m:staff_events,join:Staff=Event"`
-	CurrentImage    string         `json:"current_image" bun:"-"`
+	CurrentImage    string         `json:"current_image"`
 	Images          []*StaffImage  `json:"images" bun:"rel:has-many,join:id=user_id"`
+	Prizes          []*StaffPrize  `json:"prizes" bun:"m2m:staff_prizes,join:Staff=Prize"`
 }
 
 type StaffSignUp struct {

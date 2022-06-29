@@ -14,8 +14,20 @@ const (
 	Changed  StepStatus = "changed"
 )
 
+type Accomplishment string
+
+const (
+	InProcess    Accomplishment = "process"
+	ReadyToCheck Accomplishment = "ready-check"
+	Done         Accomplishment = "done"
+	Failed       Accomplishment = "failed"
+	Cheated      Accomplishment = "cheated"
+)
+
 type StepStatusRequest struct {
-	StepStatus StepStatus `json:"step_status"`
+	StaffID    uuid.UUID      `json:"staff_id"`
+	StepStatus Accomplishment `json:"step_status"`
+	Score      uint           `json:"score"`
 }
 
 type Step struct {
@@ -28,6 +40,7 @@ type Step struct {
 	EndDate      string       `json:"end_date"`
 	Prizes       []*Prize     `json:"prizes" bun:"rel:has-many,join:id=step_id"`
 	Task         string       `json:"task"`
+	MaxScore     uint         `json:"max_score"`
 	Level        uint         `json:"level"`
 	Status       StepStatus   `json:"status" bun:"step_status"`
 	Images       []*StepImage `json:"images" bun:"rel:has-many,join:id=step_id"`
@@ -47,12 +60,12 @@ type StepImage struct {
 type StepStaff struct {
 	bun.BaseModel `bun:"table:staff_step,alias:staff_step"`
 
-	ID             uuid.UUID  `json:"id" bun:",pk"`
-	StepID         uuid.UUID  `json:"step_id"`
-	Step           *Step      `json:"step" bun:"rel:belongs-to,join:step_id=id"`
-	StaffID        uuid.UUID  `json:"staff_id"`
-	Staff          *Staff     `json:"staff" bun:"rel:belongs-to,join:staff_id=id"`
-	Accomplishment StepStatus `json:"accomplishment"`
-	Score          uint       `json:"score"`
-	StartDate      string     `json:"start_date"`
+	ID             uuid.UUID      `json:"id" bun:",pk"`
+	StepID         uuid.UUID      `json:"step_id"`
+	Step           *Step          `json:"step" bun:"rel:belongs-to,join:step_id=id"`
+	StaffID        uuid.UUID      `json:"staff_id"`
+	Staff          *Staff         `json:"staff" bun:"rel:belongs-to,join:staff_id=id"`
+	Accomplishment Accomplishment `json:"accomplishment"`
+	Score          uint           `json:"score"`
+	StartDate      string         `json:"start_date"`
 }

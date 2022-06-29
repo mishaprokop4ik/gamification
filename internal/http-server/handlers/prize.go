@@ -8,6 +8,7 @@ import (
 	"github.com/miprokop/fication/internal/models"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 func (h *Handler) CreatePrize(c *gin.Context) {
@@ -48,14 +49,20 @@ func (h *Handler) CreatePrize(c *gin.Context) {
 			prize.PrizeStatus, models.Legendary, models.Mith, models.Common, models.Rare))
 		return
 	}
-	_, err = url.ParseRequestURI(prize.FileURL)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("can not url: %s", prize.FileURL))
-		return
+	if prize.PrizeType == models.Image || prize.PrizeType == models.Medal {
+		_, err = url.ParseRequestURI(prize.Data)
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("can not url: %s", prize.Data))
+			return
+		}
 	}
 
 	prize.ID = uuid.New()
 	prize.CreatedBy = userID.(uuid.UUID)
+	prize.CurrentCount = prize.Count
+	if prize.CreationDate == "" {
+		prize.CreationDate = time.Now().Format(time.RFC3339)
+	}
 	err = h.Service.Prize.CreatePrize(ctx, prize)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())
@@ -232,11 +239,13 @@ func (h *Handler) UpdatePrize(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get input update model in updating prize: %s", err).Error())
 		return
 	}
-	if prize.FileURL != "" {
-		_, err = url.ParseRequestURI(prize.FileURL)
-		if err != nil {
-			newErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("can not url: %s", prize.FileURL))
-			return
+	if prize.PrizeType == models.Image || prize.PrizeType == models.Medal {
+		if prize.Data != "" {
+			_, err = url.ParseRequestURI(prize.Data)
+			if err != nil {
+				newErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("can not url: %s", prize.Data))
+				return
+			}
 		}
 	}
 
@@ -288,11 +297,10 @@ func (h *Handler) GivePrize(c *gin.Context) {
 
 	var staffID *models.StaffID
 
-	if err := c.Bind(&userID); err != nil {
+	if err := c.Bind(&staffID); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get input update model in updating prize: %s", err).Error())
 		return
 	}
-
 	err = h.Service.Prize.GivePrize(ctx, staffID.StaffID, id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not update model in updating prize: %s", err).Error())

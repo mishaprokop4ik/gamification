@@ -349,7 +349,7 @@ func (h *Handler) GetOrganizationEvents(c *gin.Context) {
 	}
 	events, err := h.Service.Organization.GetOrganizationEvents(ctx, id)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not modelin getting org events: %s", err).Error())
+		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not get org events: %s", err).Error())
 		return
 	}
 	c.JSON(http.StatusOK, map[string]interface{}{

@@ -67,10 +67,24 @@ func (h *Handler) CreateStep(c *gin.Context) {
 			creationTime).Error())
 		return
 	}
-
+	step.CreationDate = creationTime.String()
+	step.EndDate = endTime.String()
+	if len(step.Prizes) != 0 {
+		for i := range step.Prizes {
+			step.Prizes[i].ID = uuid.New()
+			step.Prizes[i].StepID = step.ID
+			step.Prizes[i].CreatedBy = userID.(uuid.UUID)
+		}
+	}
+	if len(step.Images) != 0 {
+		for i := range step.Images {
+			step.Images[i].ID = uuid.New()
+			step.Images[i].StepID = step.ID
+		}
+	}
 	err = h.Service.Step.CreateStep(ctx, step, creationTime, endTime)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())
+		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create step: %s", err).Error())
 		return
 	}
 
@@ -302,14 +316,14 @@ func (h *Handler) GetStepPrizes(c *gin.Context) {
 		return
 	}
 
-	steps, err := h.Service.Step.GetStepPrizes(ctx, id)
+	prizes, err := h.Service.Step.GetStepPrizes(ctx, id)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"steps": steps,
+		"prizes": prizes,
 	})
 }
 
@@ -354,14 +368,14 @@ func (h *Handler) PassStaff(c *gin.Context) {
 		return
 	}
 
-	err = h.Service.Step.PassStaff(ctx, id, stepStatus.StepStatus)
+	err = h.Service.Step.PassStaff(ctx, id, stepStatus.StaffID, stepStatus.StepStatus, stepStatus.Score)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"passed": true,
+		"changed": true,
 	})
 }
 
@@ -395,14 +409,14 @@ func (h *Handler) AssignStaff(c *gin.Context) {
 
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in updating org: %s", err).Error())
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in assign staff to step: %s", err).Error())
 		return
 	}
 
 	var staffIDs []*models.StaffID
 
 	if err := c.Bind(&staffIDs); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get input model in creating org: %s", err).Error())
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get input model in assign staff to step: %s", err).Error())
 		return
 	}
 	for _, staffID := range staffIDs {
