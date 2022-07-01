@@ -12,6 +12,16 @@ import (
 	"sync"
 )
 
+// @title Acheer API
+// @version 1.0
+// @description API Server for challenge service
+
+// @host localhost:8082
+// @BasePath /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	if err := configs.Init("./configs"); err != nil {
 		log.Fatalf("error in config init: %s", err)

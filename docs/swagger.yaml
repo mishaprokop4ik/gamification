@@ -1,0 +1,2104 @@
+basePath: /
+definitions:
+  github.com_miprokop_fication_internal_http-server_handlers.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.eventAllData:
+    properties:
+      created_by_id:
+        type: string
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_status:
+        type: string
+      event_type:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+      staff:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.staffEvents'
+        type: array
+      steps:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.stepShortResponse'
+        type: array
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.eventRequest:
+    properties:
+      created_by_id:
+        type: string
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_status:
+        type: string
+      event_type:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+      staff:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.staffEvents'
+        type: array
+      steps:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.stepRequest'
+        type: array
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.eventRequestUpdate:
+    properties:
+      created_by_id:
+        type: string
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_status:
+        type: string
+      event_type:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.eventShortData:
+    properties:
+      created_by_id:
+        type: string
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_status:
+        type: string
+      event_type:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.eventsResponse:
+    properties:
+      events:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.eventRequest'
+        type: array
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.insertInfo:
+    properties:
+      inserted:
+        type: boolean
+      inserted_count:
+        type: integer
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.organizationResponse:
+    properties:
+      id:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      positions:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.position'
+        type: array
+      teams:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.team'
+        type: array
+      types:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.organizationType'
+        type: array
+      website_url:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.organizationType:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.organizationUpdateResponse:
+    properties:
+      id:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      website_url:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.permission:
+    properties:
+      granted_by:
+        type: string
+      permission:
+        type: string
+      position_id:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.permissions:
+    properties:
+      permissions:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.permission'
+        type: array
+      position_id:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.position:
+    properties:
+      company_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.positionCreate:
+    properties:
+      company_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.permission'
+        type: array
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.prizeRequest:
+    properties:
+      count:
+        type: integer
+      created_by:
+        type: string
+      creation_date:
+        type: string
+      current_count:
+        type: integer
+      data:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      step_id:
+        type: string
+      type:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.staffEvents:
+    properties:
+      event_id:
+        type: string
+      id:
+        type: string
+      staff_id:
+        type: string
+      staff_role:
+        type: string
+      status:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.stepImageRequest:
+    properties:
+      id:
+        type: string
+      image_url:
+        type: string
+      step_id:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.stepRequest:
+    properties:
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_id:
+        type: string
+      id:
+        type: string
+      images:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.stepImageRequest'
+        type: array
+      level:
+        type: integer
+      max_score:
+        type: integer
+      name:
+        type: string
+      prizes:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.prizeRequest'
+        type: array
+      status:
+        type: string
+      task:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.stepShortResponse:
+    properties:
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_id:
+        type: string
+      id:
+        type: string
+      level:
+        type: integer
+      max_score:
+        type: integer
+      name:
+        type: string
+      status:
+        type: string
+      task:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.team:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.updatePosition:
+    properties:
+      company_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.permission'
+        type: array
+    type: object
+  github.com_miprokop_fication_internal_http-server_handlers.users:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/models.StaffInsertion'
+        type: array
+    type: object
+  internal_http-server_handlers.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  internal_http-server_handlers.eventAllData:
+    properties:
+      created_by_id:
+        type: string
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_status:
+        type: string
+      event_type:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+      staff:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.staffEvents'
+        type: array
+      steps:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.stepShortResponse'
+        type: array
+    type: object
+  internal_http-server_handlers.eventRequest:
+    properties:
+      created_by_id:
+        type: string
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_status:
+        type: string
+      event_type:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+      staff:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.staffEvents'
+        type: array
+      steps:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.stepRequest'
+        type: array
+    type: object
+  internal_http-server_handlers.eventRequestUpdate:
+    properties:
+      created_by_id:
+        type: string
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_status:
+        type: string
+      event_type:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+    type: object
+  internal_http-server_handlers.eventShortData:
+    properties:
+      created_by_id:
+        type: string
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_status:
+        type: string
+      event_type:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+    type: object
+  internal_http-server_handlers.eventsResponse:
+    properties:
+      events:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.eventRequest'
+        type: array
+    type: object
+  internal_http-server_handlers.insertInfo:
+    properties:
+      inserted:
+        type: boolean
+      inserted_count:
+        type: integer
+    type: object
+  internal_http-server_handlers.organizationResponse:
+    properties:
+      id:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      positions:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.position'
+        type: array
+      teams:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.team'
+        type: array
+      types:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.organizationType'
+        type: array
+      website_url:
+        type: string
+    type: object
+  internal_http-server_handlers.organizationType:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  internal_http-server_handlers.organizationUpdateResponse:
+    properties:
+      id:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      website_url:
+        type: string
+    type: object
+  internal_http-server_handlers.permission:
+    properties:
+      granted_by:
+        type: string
+      permission:
+        type: string
+      position_id:
+        type: string
+    type: object
+  internal_http-server_handlers.permissions:
+    properties:
+      permissions:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.permission'
+        type: array
+      position_id:
+        type: string
+    type: object
+  internal_http-server_handlers.position:
+    properties:
+      company_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  internal_http-server_handlers.positionCreate:
+    properties:
+      company_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.permission'
+        type: array
+    type: object
+  internal_http-server_handlers.prizeRequest:
+    properties:
+      count:
+        type: integer
+      created_by:
+        type: string
+      creation_date:
+        type: string
+      current_count:
+        type: integer
+      data:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      step_id:
+        type: string
+      type:
+        type: string
+    type: object
+  internal_http-server_handlers.staffEvents:
+    properties:
+      event_id:
+        type: string
+      id:
+        type: string
+      staff_id:
+        type: string
+      staff_role:
+        type: string
+      status:
+        type: string
+    type: object
+  internal_http-server_handlers.stepImageRequest:
+    properties:
+      id:
+        type: string
+      image_url:
+        type: string
+      step_id:
+        type: string
+    type: object
+  internal_http-server_handlers.stepRequest:
+    properties:
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_id:
+        type: string
+      id:
+        type: string
+      images:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.stepImageRequest'
+        type: array
+      level:
+        type: integer
+      max_score:
+        type: integer
+      name:
+        type: string
+      prizes:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.prizeRequest'
+        type: array
+      status:
+        type: string
+      task:
+        type: string
+    type: object
+  internal_http-server_handlers.stepShortResponse:
+    properties:
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_id:
+        type: string
+      id:
+        type: string
+      level:
+        type: integer
+      max_score:
+        type: integer
+      name:
+        type: string
+      status:
+        type: string
+      task:
+        type: string
+    type: object
+  internal_http-server_handlers.team:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+    type: object
+  internal_http-server_handlers.updatePosition:
+    properties:
+      company_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/internal_http-server_handlers.permission'
+        type: array
+    type: object
+  internal_http-server_handlers.users:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/models.StaffInsertion'
+        type: array
+    type: object
+  models.Event:
+    properties:
+      created_by:
+        $ref: '#/definitions/models.Staff'
+      created_by_id:
+        type: string
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_status:
+        type: string
+      event_type:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+      staff:
+        items:
+          $ref: '#/definitions/models.StaffEvents'
+        type: array
+      steps:
+        items:
+          $ref: '#/definitions/models.Step'
+        type: array
+    type: object
+  models.Organization:
+    properties:
+      id:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      positions:
+        items:
+          $ref: '#/definitions/models.Position'
+        type: array
+      teams:
+        items:
+          $ref: '#/definitions/models.Team'
+        type: array
+      types:
+        items:
+          $ref: '#/definitions/models.OrganizationType'
+        type: array
+      website_url:
+        type: string
+    type: object
+  models.OrganizationType:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      organization:
+        items:
+          $ref: '#/definitions/models.Organization'
+        type: array
+    type: object
+  models.Permission:
+    properties:
+      granted_by:
+        type: string
+      permission:
+        type: string
+      position:
+        $ref: '#/definitions/models.Position'
+      position_id:
+        type: string
+    type: object
+  models.Position:
+    properties:
+      company_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/models.Permission'
+        type: array
+    type: object
+  models.Prize:
+    properties:
+      count:
+        type: integer
+      created_by:
+        type: string
+      creation_date:
+        type: string
+      current_count:
+        type: integer
+      data:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      prizes:
+        items:
+          $ref: '#/definitions/models.StaffPrize'
+        type: array
+      staff:
+        $ref: '#/definitions/models.Staff'
+      status:
+        type: string
+      step:
+        $ref: '#/definitions/models.Step'
+      step_id:
+        type: string
+      type:
+        type: string
+    type: object
+  models.Staff:
+    properties:
+      additional_info:
+        type: string
+      background_color:
+        type: string
+      current_image:
+        type: string
+      email:
+        type: string
+      events:
+        items:
+          $ref: '#/definitions/models.StaffEvents'
+        type: array
+      first_name:
+        type: string
+      id:
+        type: string
+      images:
+        items:
+          $ref: '#/definitions/models.StaffImage'
+        type: array
+      last_name:
+        type: string
+      organization_id:
+        type: string
+      position:
+        $ref: '#/definitions/models.Position'
+      position_id:
+        type: string
+      prizes:
+        items:
+          $ref: '#/definitions/models.StaffPrize'
+        type: array
+      sex:
+        type: string
+      team:
+        $ref: '#/definitions/models.Team'
+      team_id:
+        type: string
+      text_color:
+        type: string
+    type: object
+  models.StaffEvents:
+    properties:
+      event:
+        $ref: '#/definitions/models.Event'
+      event_id:
+        type: string
+      id:
+        type: string
+      staff:
+        $ref: '#/definitions/models.Staff'
+      staff_id:
+        type: string
+      staff_role:
+        type: string
+      status:
+        type: string
+    type: object
+  models.StaffID:
+    properties:
+      staff_id:
+        type: string
+    type: object
+  models.StaffImage:
+    properties:
+      id:
+        type: string
+      image_path:
+        type: string
+    type: object
+  models.StaffInfo:
+    properties:
+      background_color:
+        type: string
+      company_name:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      position:
+        type: string
+      text_color:
+        type: string
+    type: object
+  models.StaffInsertion:
+    properties:
+      id:
+        type: string
+      organization_id:
+        type: string
+      position_id:
+        type: string
+      team_id:
+        type: string
+    type: object
+  models.StaffLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.StaffPrize:
+    properties:
+      id:
+        type: string
+      prize:
+        $ref: '#/definitions/models.Prize'
+      prize_id:
+        type: string
+      staff:
+        $ref: '#/definitions/models.Staff'
+      staff_id:
+        type: string
+    type: object
+  models.Step:
+    properties:
+      active_staff:
+        items:
+          $ref: '#/definitions/models.Staff'
+        type: array
+      creation_date:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      event_id:
+        type: string
+      id:
+        type: string
+      images:
+        items:
+          $ref: '#/definitions/models.StepImage'
+        type: array
+      level:
+        type: integer
+      max_score:
+        type: integer
+      name:
+        type: string
+      prizes:
+        items:
+          $ref: '#/definitions/models.Prize'
+        type: array
+      status:
+        type: string
+      task:
+        type: string
+    type: object
+  models.StepImage:
+    properties:
+      id:
+        type: string
+      image_url:
+        type: string
+      step:
+        $ref: '#/definitions/models.Step'
+      step_id:
+        type: string
+    type: object
+  models.Team:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      organization:
+        $ref: '#/definitions/models.Organization'
+      organization_id:
+        type: string
+      staff:
+        items:
+          $ref: '#/definitions/models.Staff'
+        type: array
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  description: API Server for challenge service
+  title: Acheer API
+  version: "1.0"
+paths:
+  /api/event/:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        create models.Event
+        if no org id in request
+        use a default org id
+        if no type use public type
+        event status by default process
+        add a user who created this event to a member of this event
+        if some steps there creates it
+      operationId: create-event
+      parameters:
+      - description: event info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.eventRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create event
+      tags:
+      - events
+  /api/event/:id:
+    delete:
+      consumes:
+      - application/json
+      description: |-
+        delete event by id
+        also delete chained steps
+      operationId: delete-event
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Event By ID
+      tags:
+      - events
+    get:
+      consumes:
+      - application/json
+      description: Get all invitations by current user
+      operationId: get-invite-by-id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.eventAllData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get event by id
+      tags:
+      - events
+    put:
+      consumes:
+      - application/json
+      description: Update event by ID
+      operationId: update-event
+      parameters:
+      - description: event
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.eventRequestUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.eventAllData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update event by id
+      tags:
+      - events
+  /api/event/invitation/:
+    get:
+      consumes:
+      - application/json
+      description: Get all invitations by current user
+      operationId: get-invites
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.staffEvents'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all invitations
+      tags:
+      - events
+  /api/event/invitation/:id:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Answer invite by ID
+        status can be only models.InviteStatus
+      operationId: answer-invite
+      parameters:
+      - description: staff and invites relation
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.staffEvents'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Answer invite
+      tags:
+      - events
+  /api/event/invite/:id:
+    post:
+      consumes:
+      - application/json
+      description: Assign staff array
+      operationId: assign-staff-to-event
+      parameters:
+      - description: staff ids and events
+        in: body
+        name: input
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.staffEvents'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Assign Staff
+      tags:
+      - events
+  /api/event/remove/:id:
+    put:
+      consumes:
+      - application/json
+      description: Remove staff from event and connected steps
+      operationId: event-remove-staff
+      parameters:
+      - description: staffID
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.StaffID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Remove staff from event
+      tags:
+      - events
+  /api/event/score/:id:
+    get:
+      consumes:
+      - application/json
+      description: get staff score in event by ID
+      operationId: delete-event
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Staff Score In Event
+      tags:
+      - events
+  /api/event/team/:id:
+    get:
+      consumes:
+      - application/json
+      description: Get all team's events by ID
+      operationId: team-events
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.eventAllData'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all events in team
+      tags:
+      - events
+  /api/org/:
+    get:
+      consumes:
+      - application/json
+      description: Get All Organizations In Service
+      operationId: get-all-organizations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_http-server_handlers.organizationResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: ""
+        "403":
+          description: Forbidden
+          schema:
+            type: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Organizations In Service
+      tags:
+      - organizations
+    post:
+      consumes:
+      - application/json
+      description: |-
+        create models.Organization
+        create organization
+      operationId: create-organization
+      parameters:
+      - description: organization info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_http-server_handlers.organizationResponse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create organization
+      tags:
+      - organizations
+  /api/org/:id:
+    delete:
+      consumes:
+      - application/json
+      description: |-
+        delete organization by id
+        also delete all chained staff, positions, steps, teams
+      operationId: delete-organization
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Organization By ID
+      tags:
+      - organizations
+    get:
+      consumes:
+      - application/json
+      description: Get Organization By ID
+      operationId: get-organization
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.organizationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: ""
+        "403":
+          description: Forbidden
+          schema:
+            type: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Organization By ID
+      tags:
+      - organizations
+    put:
+      consumes:
+      - application/json
+      description: Update organization by id
+      operationId: update-event
+      parameters:
+      - description: organization
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_http-server_handlers.organizationUpdateResponse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update organization by id
+      tags:
+      - organizations
+  /api/org/event/:id:
+    get:
+      consumes:
+      - application/json
+      description: Get Organization Events By ID
+      operationId: get-organization-events
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_http-server_handlers.eventShortData'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: ""
+        "403":
+          description: Forbidden
+          schema:
+            type: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Organization Events By ID
+      tags:
+      - organizations
+  /api/org/staff/:id:
+    get:
+      consumes:
+      - application/json
+      description: Get All Staff In Organization By Organization ID
+      operationId: get-organization-staff
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.StaffInfo'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: ""
+        "403":
+          description: Forbidden
+          schema:
+            type: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Staff In Organization
+      tags:
+      - organizations
+    put:
+      consumes:
+      - application/json
+      description: Add Staff To Organization
+      operationId: add-staff-organization
+      parameters:
+      - description: staff ids
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_http-server_handlers.users'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.insertInfo'
+        "400":
+          description: Bad Request
+          schema:
+            type: ""
+        "403":
+          description: Forbidden
+          schema:
+            type: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Add Staff To Organization
+      tags:
+      - organizations
+  /api/org/type/:
+    get:
+      consumes:
+      - application/json
+      description: Get All Organizations Types In Service
+      operationId: get-all-organizations-types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.organizationType'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: ""
+        "403":
+          description: Forbidden
+          schema:
+            type: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Organizations Types In Service
+      tags:
+      - organizations-type
+    post:
+      consumes:
+      - application/json
+      description: create models.OrganizationType
+      operationId: create-organization-type
+      parameters:
+      - description: organization type info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.organizationType'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create organization type
+      tags:
+      - organizations-type
+  /api/org/type/:id:
+    delete:
+      consumes:
+      - application/json
+      description: delete organization type by id
+      operationId: delete-organization
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Organization Type By ID
+      tags:
+      - organization-type
+    get:
+      consumes:
+      - application/json
+      description: Get Organization By ID
+      operationId: get-organization-type
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.organizationType'
+        "400":
+          description: Bad Request
+          schema:
+            type: ""
+        "403":
+          description: Forbidden
+          schema:
+            type: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Organization Type By ID
+      tags:
+      - organizations-type
+    put:
+      consumes:
+      - application/json
+      description: Update organization type by id
+      operationId: update-event
+      parameters:
+      - description: organization type
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.organizationType'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update organization type by id
+      tags:
+      - organizations
+  /api/staff/:role:
+    get:
+      consumes:
+      - application/json
+      description: Get Events where staff takes a part by role
+      operationId: get-staff-events
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.eventsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: ""
+        "403":
+          description: Forbidden
+          schema:
+            type: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Events where staff takes a part by role
+      tags:
+      - events
+  /api/user/perm/:id:
+    put:
+      consumes:
+      - application/json
+      description: Remove Permissions From Position
+      operationId: remove-permissions
+      parameters:
+      - description: position id with permissions
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_http-server_handlers.permissions'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Remove Permissions From Position
+      tags:
+      - positions
+  /api/user/position/:
+    post:
+      consumes:
+      - application/json
+      description: create models.Position
+      operationId: create-position
+      parameters:
+      - description: position info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_http-server_handlers.positionCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Position type
+      tags:
+      - positions
+  /api/user/position/:id:
+    put:
+      consumes:
+      - application/json
+      description: Update position by id
+      operationId: update-position
+      parameters:
+      - description: position type
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_http-server_handlers.updatePosition'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/internal_http-server_handlers.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update position by id
+      tags:
+      - positions
+  /sign-in:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        sign in staff to get token
+        token is used in authorization
+      operationId: sign-in-staff
+      parameters:
+      - description: staff account log in info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.StaffLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      summary: signIn
+      tags:
+      - auth
+  /sign-up:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        create models.Staff
+        if no organization_id in input
+        push staff do default org
+        do the same stuff with position_id and team_id if organization_id is empty
+        also in registering you can pass image
+      operationId: create-staff
+      parameters:
+      - description: staff account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Staff'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/github.com_miprokop_fication_internal_http-server_handlers.errorResponse'
+      summary: SignUp
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

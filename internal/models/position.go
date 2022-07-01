@@ -12,11 +12,12 @@ var Developer = Position{
 	Permissions:  nil,
 }
 
+const DefaultAdminPositionName = "admin"
 const DefaultPositionName = "none"
 
-var DefaultPosition = Position{
+var AdminPosition = Position{
 	CompanyID: DefaultOrganization.ID,
-	Name:      DefaultPositionName,
+	Name:      DefaultAdminPositionName,
 	Permissions: []*Permission{
 		// org types
 		{
@@ -169,6 +170,97 @@ var DefaultPosition = Position{
 		},
 		{
 			Permission: StaffDelete,
+		},
+		{
+			Permission: PrizeStaffAll,
+		},
+	},
+}
+
+var DefaultPosition = Position{
+	CompanyID: DefaultOrganization.ID,
+	Name:      DefaultPositionName,
+	Permissions: []*Permission{
+		// org types
+
+		{
+			Permission: OrganizationTypeGetByID,
+		},
+		{
+			Permission: OrganizationTypeGetAll,
+		},
+		// events
+		{
+			Permission: EventGetAll,
+		},
+
+		// steps
+
+		{
+			Permission: StepGetAll,
+		},
+		{
+			Permission: StepGetByID,
+		},
+
+		// org
+
+		{
+			Permission: OrganizationGetAll,
+		},
+		{
+			Permission: OrganizationGetByID,
+		},
+
+		{
+			Permission: OrganizationEvents,
+		},
+
+		// prize
+
+		{
+			Permission: PrizeGetAll,
+		},
+		{
+			Permission: PrizeGetByID,
+		},
+		{
+			Permission: StaffByOrganizationID,
+		},
+		// teams
+
+		{
+			Permission: TeamGetAll,
+		},
+		{
+			Permission: TeamGetByID,
+		},
+
+		// pos
+
+		{
+			Permission: PositionGetAll,
+		},
+
+		{
+			Permission: PositionGetByID,
+		},
+		// staff
+
+		{
+			Permission: StaffGetAll,
+		},
+		{
+			Permission: StaffGetByID,
+		},
+		{
+			Permission: StaffSelfUpdate,
+		},
+		{
+			Permission: StaffSelfDelete,
+		},
+		{
+			Permission: StaffSelfGet,
 		},
 		{
 			Permission: PrizeStaffAll,

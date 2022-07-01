@@ -1,5 +1,12 @@
 port: 8082
 
+admin:
+  email: support@nure.ua
+  firstName: admin
+  lastName: admin
+  textColor: #FF0000
+  password: password
+
 database:
   username: postgres
   password: 12345

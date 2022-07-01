@@ -66,6 +66,34 @@ func NewRepository(db *Postgres) (*Repository, error) {
 		}
 	}
 
+	exists, err = db.DB.NewSelect().Model(&models.AdminPosition).Where("name = ?", models.AdminPosition.Name).Exists(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		models.AdminPosition.ID = uuid.New()
+		models.AdminPosition.CompanyID = models.DefaultOrganization.ID
+		_, err = db.DB.NewInsert().Model(&models.AdminPosition).Exec(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for i := range models.AdminPosition.Permissions {
+			models.AdminPosition.Permissions[i].PositionID = models.AdminPosition.ID
+		}
+		_, err = db.DB.NewInsert().Model(&models.AdminPosition.Permissions).Exec(ctx)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err = db.DB.NewSelect().Model(&models.AdminPosition).Where("name = ?", models.DefaultAdminPositionName).Scan(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for i := range models.AdminPosition.Permissions {
+			models.AdminPosition.Permissions[i].PositionID = models.AdminPosition.ID
+		}
+	}
+
 	exists, err = db.DB.NewSelect().Model(&models.DefaultPosition).Where("name = ?", models.DefaultPosition.Name).Exists(ctx)
 	if err != nil {
 		return nil, err
@@ -85,7 +113,7 @@ func NewRepository(db *Postgres) (*Repository, error) {
 			return nil, err
 		}
 	} else {
-		err = db.DB.NewSelect().Model(&models.DefaultPosition).Where("name = 'none'").Scan(ctx)
+		err = db.DB.NewSelect().Model(&models.DefaultPosition).Where("name = ?", models.DefaultPositionName).Scan(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -132,7 +160,6 @@ type Staff interface {
 	GetStaff(ctx context.Context, id uuid.UUID) (*models.Staff, error)
 	GetStaffByEvent(ctx context.Context, eventID uuid.UUID) ([]*models.Staff, error)
 	GetStaffByStep(ctx context.Context, stepID uuid.UUID) ([]*models.Staff, error)
-	GetStaffByOrganization(ctx context.Context, organizationName uuid.UUID) ([]models.Staff, error)
 	DeleteStaff(ctx context.Context, id uuid.UUID) error
 	RemoveFromPosition(ctx context.Context, staff *models.Staff) error
 	RemovePermissionsFromPosition(ctx context.Context, permission *models.Permission) error
@@ -148,8 +175,6 @@ type Staff interface {
 	UpdatePosition(ctx context.Context, position *models.Position) error
 	DeletePosition(ctx context.Context, id uuid.UUID) error
 	AssignPosition(ctx context.Context, staff *models.Staff) error
-	GrantPermission(ctx context.Context, granterID, positionID uuid.UUID, perm models.Permission) error
-	RevokePermission(ctx context.Context, roleID uuid.UUID, perm models.Permission) error
 }
 
 type Organization interface {
@@ -202,6 +227,7 @@ type Step interface {
 }
 
 type Event interface {
+	RemoveStaffFromEvent(ctx context.Context, events models.StaffEvents) error
 	GetInvites(ctx context.Context, staffID uuid.UUID) ([]*models.StaffEvents, error)
 	GetStaff(ctx context.Context, id uuid.UUID) (*models.Staff, error)
 	CreateEvent(ctx context.Context, event *models.Event) error

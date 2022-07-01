@@ -6,6 +6,8 @@ POSTGRES_NAME ?= postgres
 MIGRATE=migrate -path internal/persistence/postgres/migrations -database postgres://postgres:12345@localhost:5432/${POSTGRES_NAME}?sslmode=disable
 version = 0.0.1-beta
 
+swagger: # Generate swagger documentation
+	 swag init --parseDependency --parseInternal -g ./cmd/acheer/main.go
 dep: # Download required dependencies
 	GOPRIVATE=${GOPRIVATE} go mod tidy
 	GOPRIVATE=${GOPRIVATE} go mod download

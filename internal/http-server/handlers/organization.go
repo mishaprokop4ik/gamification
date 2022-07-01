@@ -10,6 +10,19 @@ import (
 	"net/url"
 )
 
+// GetAllOrganizations
+// @Summary Get All Organizations In Service
+// @Security ApiKeyAuth
+// @Tags organizations
+// @Description Get All Organizations In Service
+// @ID get-all-organizations
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} []organizationResponse
+// @Failure 400,403 {} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/ [get]
 func (h *Handler) GetAllOrganizations(c *gin.Context) {
 	ctx := context.Background()
 
@@ -49,6 +62,19 @@ func (h *Handler) GetAllOrganizations(c *gin.Context) {
 	})
 }
 
+// GetStaffByOrganizationID
+// @Summary Get All Staff In Organization
+// @Security ApiKeyAuth
+// @Tags organizations
+// @Description Get All Staff In Organization By Organization ID
+// @ID get-organization-staff
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} []models.StaffInfo
+// @Failure 400,403 {} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/staff/:id [get]
 func (h *Handler) GetStaffByOrganizationID(c *gin.Context) {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
@@ -93,6 +119,19 @@ func (h *Handler) GetStaffByOrganizationID(c *gin.Context) {
 	})
 }
 
+// GetOrganization
+// @Summary Get Organization By ID
+// @Security ApiKeyAuth
+// @Tags organizations
+// @Description Get Organization By ID
+// @ID get-organization
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} organizationResponse
+// @Failure 400,403 {} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/:id [get]
 func (h *Handler) GetOrganization(c *gin.Context) {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
@@ -137,6 +176,20 @@ func (h *Handler) GetOrganization(c *gin.Context) {
 	})
 }
 
+// DeleteOrganization
+// @Summary Delete Organization By ID
+// @Security ApiKeyAuth
+// @Tags organizations
+// @Description delete organization by id
+// @Description also delete all chained staff, positions, steps, teams
+// @ID delete-organization
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} boolean
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/:id [delete]
 func (h *Handler) DeleteOrganization(c *gin.Context) {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
@@ -181,6 +234,21 @@ func (h *Handler) DeleteOrganization(c *gin.Context) {
 	})
 }
 
+// CreateOrganization
+// @Summary Create organization
+// @Security ApiKeyAuth
+// @Tags organizations
+// @Description create models.Organization
+// @Description create organization
+// @ID create-organization
+// @Accept  json
+// @Produce  json
+// @Param input body organizationResponse true "organization info"
+// @Success 200 {string} uuid
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/ [post]
 func (h *Handler) CreateOrganization(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -229,7 +297,7 @@ func (h *Handler) CreateOrganization(c *gin.Context) {
 		if orgType.Name == "none" {
 			if len(org.Positions) == 0 {
 				org.Positions = []models.Position{
-					models.DefaultPosition,
+					models.AdminPosition,
 				}
 				org.Positions[0].ID = uuid.New()
 			}
@@ -252,6 +320,20 @@ func (h *Handler) CreateOrganization(c *gin.Context) {
 	})
 }
 
+// UpdateOrganization
+// @Summary Update organization by id
+// @Security ApiKeyAuth
+// @Tags organizations
+// @Description Update organization by id
+// @ID update-event
+// @Accept  json
+// @Produce  json
+// @Param input body organizationUpdateResponse true "organization"
+// @Success 200 {object} boolean
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/:id [put]
 func (h *Handler) UpdateOrganization(c *gin.Context) {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
@@ -316,6 +398,19 @@ func (h *Handler) UpdateOrganization(c *gin.Context) {
 	})
 }
 
+// GetOrganizationEvents
+// @Summary Get Organization Events By ID
+// @Security ApiKeyAuth
+// @Tags organizations
+// @Description Get Organization Events By ID
+// @ID get-organization-events
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} []eventShortData
+// @Failure 400,403 {} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/event/:id [get]
 func (h *Handler) GetOrganizationEvents(c *gin.Context) {
 	ctx := context.Background()
 	id, err := uuid.Parse(c.Param("id"))
@@ -357,6 +452,20 @@ func (h *Handler) GetOrganizationEvents(c *gin.Context) {
 	})
 }
 
+// AddStaffToOrganization
+// @Summary Add Staff To Organization
+// @Security ApiKeyAuth
+// @Tags organizations
+// @Description Add Staff To Organization
+// @ID add-staff-organization
+// @Param input body users true "staff ids"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} insertInfo
+// @Failure 400,403 {} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/staff/:id [put]
 func (h *Handler) AddStaffToOrganization(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -387,10 +496,6 @@ func (h *Handler) AddStaffToOrganization(c *gin.Context) {
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in adding staff into org: %s", err).Error())
 		return
-	}
-
-	type users struct {
-		Staff []*models.StaffInsertion `json:"users"`
 	}
 
 	var requestStaff users

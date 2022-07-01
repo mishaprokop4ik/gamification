@@ -9,6 +9,20 @@ import (
 	"net/http"
 )
 
+// UpdatePosition
+// @Summary Update position by id
+// @Security ApiKeyAuth
+// @Tags positions
+// @Description Update position by id
+// @ID update-position
+// @Accept  json
+// @Produce  json
+// @Param input body updatePosition true "position type"
+// @Success 200 {object} boolean
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/user/position/:id [put]
 func (h *Handler) UpdatePosition(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -64,6 +78,20 @@ func (h *Handler) UpdatePosition(c *gin.Context) {
 	})
 }
 
+// RemovePermissions
+// @Summary Remove Permissions From Position
+// @Security ApiKeyAuth
+// @Tags positions
+// @Description Remove Permissions From Position
+// @ID remove-permissions
+// @Accept  json
+// @Produce  json
+// @Param input body permissions true "position id with permissions"
+// @Success 200 {object} boolean
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/user/perm/:id [put]
 func (h *Handler) RemovePermissions(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -158,6 +186,20 @@ func (h *Handler) DeletePosition(c *gin.Context) {
 	})
 }
 
+// CreatePosition
+// @Summary Create Position type
+// @Security ApiKeyAuth
+// @Tags positions
+// @Description create models.Position
+// @ID create-position
+// @Accept  json
+// @Produce  json
+// @Param input body positionCreate true "position info"
+// @Success 200 {string} uuid
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/user/position/ [post]
 func (h *Handler) CreatePosition(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")

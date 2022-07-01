@@ -2,9 +2,11 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
 	"github.com/miprokop/fication/internal/persistence/postgres"
+	"github.com/spf13/viper"
 	"time"
 )
 
@@ -89,7 +91,7 @@ type Prize interface {
 type Step interface {
 	CreateStep(ctx context.Context, step *models.Step, creationTime, endTime time.Time) error
 	GetStep(ctx context.Context, id uuid.UUID) (*models.Step, error)
-	GetSteps(ctx context.Context, stepID uuid.UUID) ([]*models.Step, error)
+	GetSteps(ctx context.Context, eventID uuid.UUID) ([]*models.Step, error)
 	DeleteStep(ctx context.Context, id uuid.UUID) error
 	GetStepPrizes(ctx context.Context, id uuid.UUID) ([]*models.Prize, error)
 	AssignStaff(ctx context.Context, staffID, stepID uuid.UUID) error
@@ -99,6 +101,7 @@ type Step interface {
 }
 
 type Event interface {
+	RemoveStaffFromEvent(ctx context.Context, events models.StaffEvents) error
 	GetInvites(ctx context.Context, staffID uuid.UUID) ([]*models.StaffEvents, error)
 	CreateEvent(ctx context.Context, event *models.Event) error
 	GetEvent(ctx context.Context, id uuid.UUID) (*models.Event, error)
@@ -114,6 +117,28 @@ type Event interface {
 
 func NewService(r *postgres.Repository) *Service {
 	ctx := context.Background()
+
+	staff := &models.StaffSignUp{
+		ID:              uuid.New(),
+		FirstName:       viper.GetString("admin.firstName"),
+		LastName:        viper.GetString("admin.LastName"),
+		Email:           viper.GetString("admin.email"),
+		Password:        generatePasswordHash(viper.GetString("admin.password")),
+		Sex:             models.Male,
+		AdditionalInfo:  "admin",
+		TeamID:          models.DefaultTeam.ID,
+		PositionID:      models.AdminPosition.ID,
+		OrganizationID:  models.DefaultOrganization.ID,
+		TextColor:       models.HexColor(viper.GetString("admin.textColor")),
+		BackgroundColor: "#ffffff",
+	}
+
+	if _, err := r.Staff.GetStaffAuth(ctx, staff.Email, staff.Password); err != nil && err == sql.ErrNoRows {
+		_, err := r.Staff.CreateStaffUser(ctx, staff)
+		if err != nil {
+			panic(err)
+		}
+	}
 	return &Service{
 		Auth:         NewAuthService(ctx, r.Staff),
 		Staff:        NewStaffService(ctx, r.Staff),

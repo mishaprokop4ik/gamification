@@ -8,8 +8,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -39,6 +41,22 @@ func (h *Handler) identity(c *gin.Context) {
 	c.Set("userID", userID)
 }
 
+// @Summary SignUp
+// @Tags auth
+// @Description create models.Staff
+// @Description if no organization_id in input
+// @Description push staff do default org
+// @Description do the same stuff with position_id and team_id if organization_id is empty
+// @Description also in registering you can pass image
+// @ID create-staff
+// @Accept  json
+// @Produce  json
+// @Param input body models.Staff true "staff account info"
+// @Success 200
+// @Failure 400 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
 	ctx := context.Background()
 	reqData := []byte(c.PostForm("json"))
@@ -50,6 +68,11 @@ func (h *Handler) signUp(c *gin.Context) {
 	}
 	file, _ := c.FormFile("file")
 	if file != nil && file.Filename != "" {
+		if filepath.Ext(file.Filename) != ".png" {
+			newErrorResponse(c, http.StatusBadRequest,
+				fmt.Sprintf("this format is unsupported: %s; want: png", filepath.Ext(file.Filename)))
+			return
+		}
 		dst := fmt.Sprintf("%s/%s", imagePath, file.Filename)
 		err := c.SaveUploadedFile(file, dst)
 		if err != nil {
@@ -59,6 +82,11 @@ func (h *Handler) signUp(c *gin.Context) {
 			return
 		}
 		input.CurrentImage = dst
+	}
+	if input.Email == viper.GetString("admin.email") {
+		newErrorResponse(c, http.StatusForbidden,
+			fmt.Sprintf("use this email is forbidden"))
+		return
 	}
 	if !(string(input.TextColor) == "") && !input.TextColor.IsHex() ||
 		!(string(input.BackgroundColor) == "") && !input.BackgroundColor.IsHex() {
@@ -107,6 +135,19 @@ func (h *Handler) signUp(c *gin.Context) {
 	c.Status(http.StatusCreated)
 }
 
+// @Summary signIn
+// @Tags auth
+// @Description sign in staff to get token
+// @Description token is used in authorization
+// @ID sign-in-staff
+// @Accept  json
+// @Produce  json
+// @Param input body models.StaffLogin true "staff account log in info"
+// @Success 200 {string} token
+// @Failure 400 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
 	var input models.StaffLogin
 	if err := c.BindJSON(&input); err != nil {

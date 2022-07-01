@@ -9,6 +9,20 @@ import (
 	"net/http"
 )
 
+// CreateOrganizationType
+// @Summary Create organization type
+// @Security ApiKeyAuth
+// @Tags organizations-type
+// @Description create models.OrganizationType
+// @ID create-organization-type
+// @Accept  json
+// @Produce  json
+// @Param input body organizationType true "organization type info"
+// @Success 200 {string} uuid
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/type/ [post]
 func (h *Handler) CreateOrganizationType(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -54,6 +68,19 @@ func (h *Handler) CreateOrganizationType(c *gin.Context) {
 	})
 }
 
+// GetOrganizationTypes
+// @Summary Get All Organizations Types In Service
+// @Security ApiKeyAuth
+// @Tags organizations-type
+// @Description Get All Organizations Types In Service
+// @ID get-all-organizations-types
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} []organizationType
+// @Failure 400,403 {} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/type/ [get]
 func (h *Handler) GetOrganizationTypes(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -91,6 +118,19 @@ func (h *Handler) GetOrganizationTypes(c *gin.Context) {
 	})
 }
 
+// GetOrganizationTypeByID
+// @Summary Get Organization Type By ID
+// @Security ApiKeyAuth
+// @Tags organizations-type
+// @Description Get Organization By ID
+// @ID get-organization-type
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} organizationType
+// @Failure 400,403 {} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/type/:id [get]
 func (h *Handler) GetOrganizationTypeByID(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -133,6 +173,19 @@ func (h *Handler) GetOrganizationTypeByID(c *gin.Context) {
 	})
 }
 
+// DeleteOrganizationType
+// @Summary Delete Organization Type By ID
+// @Security ApiKeyAuth
+// @Tags organization-type
+// @Description delete organization type by id
+// @ID delete-organization
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} boolean
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/type/:id [delete]
 func (h *Handler) DeleteOrganizationType(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -175,6 +228,20 @@ func (h *Handler) DeleteOrganizationType(c *gin.Context) {
 	})
 }
 
+// UpdateOrganizationType
+// @Summary Update organization type by id
+// @Security ApiKeyAuth
+// @Tags organizations
+// @Description Update organization type by id
+// @ID update-event
+// @Accept  json
+// @Produce  json
+// @Param input body organizationType true "organization type"
+// @Success 200 {object} boolean
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/org/type/:id [put]
 func (h *Handler) UpdateOrganizationType(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")

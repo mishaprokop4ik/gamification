@@ -122,11 +122,6 @@ func (s *StaffRepo) GetStaffByStep(ctx context.Context, stepID uuid.UUID) ([]*mo
 	return staff, err
 }
 
-func (s *StaffRepo) GetStaffByOrganization(ctx context.Context, organizationName uuid.UUID) ([]models.Staff, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (s *StaffRepo) DeleteStaff(ctx context.Context, id uuid.UUID) error {
 	_, err := s.DB.NewDelete().Model(&models.Staff{}).Where("id = ?", id).Exec(ctx)
 	return err
@@ -238,16 +233,6 @@ func (s *StaffRepo) DeletePosition(ctx context.Context, id uuid.UUID) error {
 func (s *StaffRepo) AssignPosition(ctx context.Context, staff *models.Staff) error {
 	_, err := s.DB.NewUpdate().Model(staff).OmitZero().Where("id = ?", staff.ID).Exec(ctx)
 	return err
-}
-
-func (s *StaffRepo) GrantPermission(ctx context.Context, granterID, positionID uuid.UUID, perm models.Permission) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s *StaffRepo) RevokePermission(ctx context.Context, roleID uuid.UUID, perm models.Permission) error {
-	//TODO implement me
-	panic("implement me")
 }
 
 func NewStaffRepo(ctx context.Context, DB *bun.DB) *StaffRepo {

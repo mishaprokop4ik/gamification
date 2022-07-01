@@ -373,6 +373,28 @@ func (h *Handler) PassStaff(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())
 		return
 	}
+	if stepStatus.StepStatus == models.Done {
+		step, err := h.Service.Step.GetStep(ctx, id)
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not get model: %s", err).Error())
+			return
+		}
+		steps, err := h.Service.Step.GetSteps(ctx, step.EventID)
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not get model: %s", err).Error())
+			return
+		}
+		for _, s := range steps {
+			if s.Level > step.Level {
+				err = h.Service.Step.AssignStaff(ctx, stepStatus.StaffID, s.ID)
+				if err != nil {
+					newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())
+					return
+				}
+				break
+			}
+		}
+	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"changed": true,

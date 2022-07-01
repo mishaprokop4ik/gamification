@@ -6,8 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
+	"github.com/spf13/viper"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 func (h *Handler) GetStaffInvites(c *gin.Context) {
@@ -339,7 +341,11 @@ func (h *Handler) CreateStaff(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())
 		return
 	}
-
+	if input.Email == viper.GetString("admin.email") {
+		newErrorResponse(c, http.StatusForbidden,
+			fmt.Sprintf("use this email is forbidden"))
+		return
+	}
 	if !(string(input.TextColor) == "") && !input.TextColor.IsHex() ||
 		!(string(input.BackgroundColor) == "") && !input.BackgroundColor.IsHex() {
 		newErrorResponse(c, http.StatusBadRequest,
@@ -368,6 +374,11 @@ func (h *Handler) UploadImage(c *gin.Context) {
 		return
 	}
 	file, _ := c.FormFile("file")
+	if filepath.Ext(file.Filename) != ".png" {
+		newErrorResponse(c, http.StatusBadRequest,
+			fmt.Sprintf("this format is unsupported: %s; want: png", filepath.Ext(file.Filename)))
+		return
+	}
 	dst := fmt.Sprintf("%s/%s", imagePath, file.Filename)
 	err := c.SaveUploadedFile(file, dst)
 	if err != nil {

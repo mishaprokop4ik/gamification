@@ -10,6 +10,19 @@ import (
 	"time"
 )
 
+// GetUserEvents
+// @Summary Get Events where staff takes a part by role
+// @Security ApiKeyAuth
+// @Tags events
+// @Description Get Events where staff takes a part by role
+// @ID get-staff-events
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} eventsResponse
+// @Failure 400,403 {} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/staff/:role [get]
 func (h *Handler) GetUserEvents(c *gin.Context) {
 	ctx := context.Background()
 	id, ok := c.Get("userID")
@@ -43,6 +56,26 @@ func (h *Handler) GetUserEvents(c *gin.Context) {
 	})
 }
 
+// CreateEvent
+// @Summary Create event
+// @Security ApiKeyAuth
+// @Tags events
+// @Description create models.Event
+// @Description if no org id in request
+// @Description use a default org id
+// @Description if no type use public type
+// @Description event status by default process
+// @Description add a user who created this event to a member of this event
+// @Description if some steps there creates it
+// @ID create-event
+// @Accept  json
+// @Produce  json
+// @Param input body eventRequest true "event info"
+// @Success 200 {string} uuid
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/event/ [post]
 func (h *Handler) CreateEvent(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -145,6 +178,20 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 	})
 }
 
+// AssignStaffToEvent
+// @Summary Assign Staff
+// @Security ApiKeyAuth
+// @Tags events
+// @Description Assign staff array
+// @ID assign-staff-to-event
+// @Accept  json
+// @Produce  json
+// @Param input body []staffEvents true "staff ids and events"
+// @Success 200 {string} uuid
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/event/invite/:id [post]
 func (h *Handler) AssignStaffToEvent(c *gin.Context) {
 	ctx := context.Background()
 
@@ -196,6 +243,21 @@ func (h *Handler) AssignStaffToEvent(c *gin.Context) {
 	})
 }
 
+// AnswerInvitation
+// @Summary Answer invite
+// @Security ApiKeyAuth
+// @Tags events
+// @Description Answer invite by ID
+// @Description status can be only models.InviteStatus
+// @ID answer-invite
+// @Accept  json
+// @Produce  json
+// @Param input body staffEvents true "staff and invites relation"
+// @Success 200 {string} uuid
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/event/invitation/:id [post]
 func (h *Handler) AnswerInvitation(c *gin.Context) {
 	ctx := context.Background()
 
@@ -237,6 +299,19 @@ func (h *Handler) AnswerInvitation(c *gin.Context) {
 	})
 }
 
+// GetInvitations
+// @Summary Get all invitations
+// @Security ApiKeyAuth
+// @Tags events
+// @Description Get all invitations by current user
+// @ID get-invites
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} []staffEvents
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/event/invitation/ [get]
 func (h *Handler) GetInvitations(c *gin.Context) {
 	ctx := context.Background()
 
@@ -264,6 +339,19 @@ func (h *Handler) GetInvitations(c *gin.Context) {
 	})
 }
 
+// GetEventByID
+// @Summary Get event by id
+// @Security ApiKeyAuth
+// @Tags events
+// @Description Get all invitations by current user
+// @ID get-invite-by-id
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} eventAllData
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/event/:id [get]
 func (h *Handler) GetEventByID(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -306,6 +394,20 @@ func (h *Handler) GetEventByID(c *gin.Context) {
 	})
 }
 
+// UpdateEvent
+// @Summary Update event by id
+// @Security ApiKeyAuth
+// @Tags events
+// @Description Update event by ID
+// @ID update-event
+// @Accept  json
+// @Produce  json
+// @Param input body eventRequestUpdate true "event"
+// @Success 200 {object} eventAllData
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/event/:id [put]
 func (h *Handler) UpdateEvent(c *gin.Context) {
 	ctx := context.Background()
 
@@ -348,7 +450,9 @@ func (h *Handler) UpdateEvent(c *gin.Context) {
 	}
 
 	event.ID = id
-
+	for i := range event.StaffEvents {
+		event.StaffEvents[i].EventID = id
+	}
 	err = h.Service.Event.UpdateEvent(ctx, event)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not update model in updating team: %s", err).Error())
@@ -359,6 +463,20 @@ func (h *Handler) UpdateEvent(c *gin.Context) {
 	})
 }
 
+// DeleteEvent
+// @Summary Delete Event By ID
+// @Security ApiKeyAuth
+// @Tags events
+// @Description delete event by id
+// @Description also delete chained steps
+// @ID delete-event
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} boolean
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/event/:id [delete]
 func (h *Handler) DeleteEvent(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -401,6 +519,19 @@ func (h *Handler) DeleteEvent(c *gin.Context) {
 	})
 }
 
+// GetTeamEvents
+// @Summary Get all events in team
+// @Security ApiKeyAuth
+// @Tags events
+// @Description Get all team's events by ID
+// @ID team-events
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} []eventAllData
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/event/team/:id [get]
 func (h *Handler) GetTeamEvents(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
@@ -443,6 +574,85 @@ func (h *Handler) GetTeamEvents(c *gin.Context) {
 	})
 }
 
+// RemoveStaffFromEvent
+// @Summary Remove staff from event
+// @Security ApiKeyAuth
+// @Tags events
+// @Description Remove staff from event and connected steps
+// @ID event-remove-staff
+// @Accept  json
+// @Param input body models.StaffID true "staffID"
+// @Produce  json
+// @Success 200 {object} boolean
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/event/remove/:id [delete]
+func (h *Handler) RemoveStaffFromEvent(c *gin.Context) {
+	ctx := context.Background()
+	userID, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+	_, ok = userID.(uuid.UUID)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"can not parse user id from context")
+		return
+	}
+
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasOneOfPermissions(models.EventCreate, models.EventDelete) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not parse input id in teams by org: %s", err).Error())
+		return
+	}
+	var staffID *models.StaffID
+
+	if err := c.Bind(&staffID); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get input model in removing staff from event: %s", err).Error())
+		return
+	}
+	event := models.StaffEvents{
+		StaffID: staffID.StaffID,
+		EventID: id,
+	}
+
+	err = h.Service.Event.RemoveStaffFromEvent(ctx, event)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())
+		return
+	}
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"removed": true,
+	})
+}
+
+// GetStaffScore
+// @Summary Get Staff Score In Event
+// @Security ApiKeyAuth
+// @Tags events
+// @Description get staff score in event by ID
+// @ID delete-event
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} integer
+// @Failure 400,403 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/event/score/:id [get]
 func (h *Handler) GetStaffScore(c *gin.Context) {
 	ctx := context.Background()
 	userID, ok := c.Get("userID")
