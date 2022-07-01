@@ -31,13 +31,13 @@ func NewAuthService(ctx context.Context, rep postgres.StaffAuth) *AuthService {
 	return &AuthService{rep: rep, ctx: ctx}
 }
 
-func (s *AuthService) GenerateToken(email, password string) (string, error) {
+func (s *AuthService) GenerateToken(email, password string) (string, uuid.UUID, error) {
 	staff, err := s.rep.GetStaffAuth(s.ctx, email, generatePasswordHash(password))
 	if err != nil {
-		return "", err
+		return "", uuid.UUID{}, err
 	}
 	if staff == nil {
-		return "", fmt.Errorf("no such user")
+		return "", uuid.UUID{}, fmt.Errorf("no such user")
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, TokenClaims{
 		jwt.StandardClaims{
@@ -46,7 +46,8 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 		},
 		staff.ID,
 	})
-	return token.SignedString([]byte(signingKey))
+	resp, err := token.SignedString([]byte(signingKey))
+	return resp, staff.ID, err
 }
 
 func (s *AuthService) ParseToken(accessToken string) (uuid.UUID, error) {

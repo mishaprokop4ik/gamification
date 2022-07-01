@@ -21,7 +21,7 @@ type Service struct {
 }
 
 type Auth interface {
-	GenerateToken(email, password string) (string, error)
+	GenerateToken(email, password string) (string, uuid.UUID, error)
 	ParseToken(accessToken string) (uuid.UUID, error)
 }
 

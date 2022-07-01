@@ -87,15 +87,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		event := api.Group("/event")
 		{
-			event.POST("/", h.CreateEvent)
+			event.POST("/", h.CreateEvent) // ads
 			event.POST("/invite/:id", h.AssignStaffToEvent)
-			event.POST("/invitation/:id", h.AnswerInvitation)
-			event.GET("/invitation/", h.GetInvitations)
-			event.GET("/:id", h.GetEventByID)
-			event.GET("/staff/:role", h.GetUserEvents)
-			event.GET("/team/:id", h.GetTeamEvents)
+			event.POST("/invitation/:id", h.AnswerInvitation) // ads
+			event.GET("/invitation/", h.GetInvitations)       // ads
+			event.GET("/:id", h.GetEventByID)                 // ads
+			event.GET("/staff/:role", h.GetUserEvents)        // ads
+			event.GET("/team/:id", h.GetTeamEvents)           // ads
 			event.PUT("/:id", h.UpdateEvent)
-			event.GET("/score/:id", h.GetStaffScore)
+			event.GET("/score/:id", h.GetStaffScore) // ads
 			event.DELETE("/remove/:id", h.RemoveStaffFromEvent)
 			event.DELETE("/:id", h.DeleteEvent)
 
