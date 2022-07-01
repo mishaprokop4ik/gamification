@@ -95,9 +95,18 @@ func (o *OrganizationRepo) DeleteOrganization(ctx context.Context, id uuid.UUID)
 	return err
 }
 
-func (o *OrganizationRepo) GetOrganizationEvents(ctx context.Context, id uuid.UUID) ([]*models.Event, error) {
+func (o *OrganizationRepo) GetOrganizationEvents(ctx context.Context, orgID, staffID uuid.UUID) ([]*models.Event, error) {
 	var events []*models.Event
-	err := o.DB.NewSelect().Model(&events).Where("organization_id = ?", id).Scan(ctx)
+	var staff = new(models.Staff)
+	err := o.DB.NewSelect().Model(staff).Where("id = ?", staff.ID).Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if staff.OrganizationID == orgID {
+		err = o.DB.NewSelect().Model(&events).Where("organization_id = ?", orgID).Where("event_type != 'team-only'").Scan(ctx)
+	} else {
+		err = o.DB.NewSelect().Model(&events).Where("organization_id = ?", orgID).Where("event_type = 'public'").Scan(ctx)
+	}
 	return events, err
 }
 

@@ -71,8 +71,8 @@ func (o *OrganizationService) DeleteOrganization(ctx context.Context, id uuid.UU
 	return o.repo.DeleteOrganization(ctx, id)
 }
 
-func (o *OrganizationService) GetOrganizationEvents(ctx context.Context, id uuid.UUID) ([]*models.Event, error) {
-	return o.repo.GetOrganizationEvents(ctx, id)
+func (o *OrganizationService) GetOrganizationEvents(ctx context.Context, orgID, staffID uuid.UUID) ([]*models.Event, error) {
+	return o.repo.GetOrganizationEvents(ctx, orgID, staffID)
 }
 
 func (o *OrganizationService) GetOrganizationStaff(ctx context.Context, orgID uuid.UUID) ([]models.StaffInfo, error) {

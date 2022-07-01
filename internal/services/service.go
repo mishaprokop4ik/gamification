@@ -57,7 +57,7 @@ type Organization interface {
 	UpdateOrganization(ctx context.Context, org *models.Organization) error
 	AddUsersToOrg(ctx context.Context, orgID uuid.UUID, users []*models.StaffInsertion) error
 	DeleteOrganization(ctx context.Context, id uuid.UUID) error
-	GetOrganizationEvents(ctx context.Context, id uuid.UUID) ([]*models.Event, error)
+	GetOrganizationEvents(ctx context.Context, orgID, staffID uuid.UUID) ([]*models.Event, error)
 	GetOrganizationStaff(ctx context.Context, orgID uuid.UUID) ([]models.StaffInfo, error)
 
 	CreateOrganizationType(ctx context.Context, orgType *models.OrganizationType) error
