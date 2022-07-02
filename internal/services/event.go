@@ -26,7 +26,16 @@ func (e *EventService) GetStaffScore(ctx context.Context, eventID, staffID uuid.
 }
 
 func (e *EventService) AnswerInvitation(ctx context.Context, events models.StaffEvents) error {
-	return e.repo.AnswerInvitation(ctx, events)
+	switch events.Status {
+	case models.Accepted:
+		err := e.repo.AssignStaff(ctx, events)
+		if err != nil {
+			return err
+		}
+	case models.InProgress:
+		return nil
+	}
+	return e.repo.DeleteInvitation(ctx, events)
 }
 
 func (e *EventService) AssignStaff(ctx context.Context, events []models.StaffEvents, eventID uuid.UUID) error {

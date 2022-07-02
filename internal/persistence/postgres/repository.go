@@ -228,6 +228,7 @@ type Step interface {
 
 type Event interface {
 	RemoveStaffFromEvent(ctx context.Context, events models.StaffEvents) error
+	DeleteInvitation(ctx context.Context, events models.StaffEvents) error
 	GetInvites(ctx context.Context, staffID uuid.UUID) ([]*models.StaffEvents, error)
 	GetStaff(ctx context.Context, id uuid.UUID) (*models.Staff, error)
 	CreateEvent(ctx context.Context, event *models.Event) error

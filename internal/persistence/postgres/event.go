@@ -14,6 +14,12 @@ type EventRepo struct {
 	ctx context.Context
 }
 
+func (e *EventRepo) DeleteInvitation(ctx context.Context, events models.StaffEvents) error {
+	_, err := e.DB.NewDelete().Model(&events).
+		Where("event_id = ?", events.EventID).Where("user_id = ?", events.StaffID).Exec(ctx)
+	return err
+}
+
 func (e *EventRepo) RemoveStaffFromEvent(ctx context.Context, events models.StaffEvents) error {
 	tx, err := e.DB.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
