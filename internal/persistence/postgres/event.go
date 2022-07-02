@@ -76,7 +76,9 @@ func (e *EventRepo) IsStaffInTeam(ctx context.Context, staffID, teamID uuid.UUID
 
 func (e *EventRepo) GetInvites(ctx context.Context, staffID uuid.UUID) ([]*models.StaffEvents, error) {
 	invites := new([]*models.StaffEvents)
-	err := e.DB.NewSelect().Model(invites).Relation("Event").Where("user_id = ?", staffID).Distinct().Scan(ctx)
+	err := e.DB.NewSelect().Model(invites).Relation("Event").Where("user_id = ?", staffID).
+		Where("status NOT IN (?)", bun.In([]string{string(models.Accepted), string(models.Declared)})).
+		Distinct().Scan(ctx)
 	return *invites, err
 }
 
