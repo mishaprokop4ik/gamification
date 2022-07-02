@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/miprokop/fication/internal/models"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"net/http"
 	"os"
@@ -223,6 +225,23 @@ func (h *Handler) UpdateStaffByID(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
+	if !staff.Sex.IsCorrect(string(staff.Sex)) {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Sprintf("incorrect sex input: %s; want: %s, %s", staff.Sex,
+			models.Male, models.Female))
+		return
+	}
+	if input.Email == viper.GetString("admin.email") {
+		newErrorResponse(c, http.StatusForbidden,
+			fmt.Sprintf("use this email is forbidden"))
+		return
+	}
+	if !(string(input.TextColor) == "") && !input.TextColor.IsHex() ||
+		!(string(input.BackgroundColor) == "") && !input.BackgroundColor.IsHex() {
+		newErrorResponse(c, http.StatusBadRequest,
+			fmt.Sprintf("incorrect color format: %s, %s, want: #000000",
+				input.TextColor, "input.BackgroundColor"))
+		return
+	}
 	staffUpdate := &models.Staff{
 		ID:              id,
 		FirstName:       input.FirstName,
@@ -237,6 +256,7 @@ func (h *Handler) UpdateStaffByID(c *gin.Context) {
 		TextColor:       input.TextColor,
 		BackgroundColor: input.BackgroundColor,
 	}
+
 	err = h.Service.Staff.UpdateStaff(ctx, staffUpdate)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError,
@@ -299,13 +319,13 @@ func (h *Handler) DeleteStaff(c *gin.Context) {
 }
 
 func (h *Handler) GetImage(c *gin.Context) {
-	_, ok := c.Get("userID")
+	id, ok := c.Get("userID")
 	if !ok {
 		newErrorResponse(c, http.StatusInternalServerError, "user id is not found")
 		return
 	}
 	fileName := c.Param("id")
-	endpointFile := fmt.Sprintf("%s/%s", imagePath, fileName)
+	endpointFile := fmt.Sprintf("%s/%s/%s", imagePath, id, fileName)
 	c.File(endpointFile)
 }
 
@@ -339,6 +359,11 @@ func (h *Handler) CreateStaff(c *gin.Context) {
 
 	if err := c.Bind(&input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())
+		return
+	}
+	if !staff.Sex.IsCorrect(string(staff.Sex)) {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Sprintf("incorrect sex input: %s; want: %s, %s", staff.Sex,
+			models.Male, models.Female))
 		return
 	}
 	if input.Email == viper.GetString("admin.email") {
@@ -383,7 +408,14 @@ func (h *Handler) UploadImage(c *gin.Context) {
 			fmt.Sprintf("this format is unsupported: %s; want: png", filepath.Ext(file.Filename)))
 		return
 	}
-	dst := fmt.Sprintf("%s/%s", imagePath, file.Filename)
+	dir := fmt.Sprintf("%s/%s", imagePath, id)
+	if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(dir, os.ModePerm)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	dst := fmt.Sprintf("%s/%s/%s", imagePath, id, file.Filename)
 	err = c.SaveUploadedFile(file, dst)
 	if err != nil {
 		_ = os.Remove(dst)

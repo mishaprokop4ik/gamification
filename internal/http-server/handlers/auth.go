@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -66,6 +67,7 @@ func (h *Handler) signUp(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+	id := uuid.New()
 	file, _ := c.FormFile("file")
 	if file != nil && file.Filename != "" {
 		if filepath.Ext(file.Filename) != ".png" {
@@ -73,7 +75,14 @@ func (h *Handler) signUp(c *gin.Context) {
 				fmt.Sprintf("this format is unsupported: %s; want: png", filepath.Ext(file.Filename)))
 			return
 		}
-		dst := fmt.Sprintf("%s/%s", imagePath, file.Filename)
+		dir := fmt.Sprintf("%s/%s", imagePath, id)
+		if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
+			err := os.Mkdir(dir, os.ModePerm)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+		dst := fmt.Sprintf("%s/%s/%s", imagePath, id, file.Filename)
 		err := c.SaveUploadedFile(file, dst)
 		if err != nil {
 			log.Error(err)
@@ -123,7 +132,7 @@ func (h *Handler) signUp(c *gin.Context) {
 		input.TeamID = models.DefaultTeam.ID
 	}
 
-	input.ID = uuid.New()
+	input.ID = id
 	input.TextColor = "#000000"
 	input.BackgroundColor = "#fffff"
 	err := h.Service.Staff.CreateStaffUser(c.Request.Context(), &input)
