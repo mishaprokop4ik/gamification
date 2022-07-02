@@ -193,6 +193,9 @@ var DefaultPosition = Position{
 		{
 			Permission: EventGetAll,
 		},
+		{
+			Permission: EventGetByID,
+		},
 
 		// steps
 
