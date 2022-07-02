@@ -287,7 +287,7 @@ func (h *Handler) AnswerInvitation(c *gin.Context) {
 		return
 	}
 	staffEvents.StaffID = userID.(uuid.UUID)
-	staffEvents.EventID = id
+	staffEvents.ID = id
 	err = h.Service.Event.AnswerInvitation(ctx, staffEvents)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("can not create model: %s", err).Error())

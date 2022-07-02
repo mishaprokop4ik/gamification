@@ -108,7 +108,7 @@ func (e *EventRepo) GetStaffScore(ctx context.Context, eventID, staffID uuid.UUI
 
 func (e *EventRepo) AnswerInvitation(ctx context.Context, events models.StaffEvents) error {
 	_, err := e.DB.NewUpdate().Model(&events).OmitZero().
-		Where("event_id = ?", events.EventID).Where("user_id = ?", events.StaffID).Exec(ctx)
+		Where("id = ?", events.ID).Where("user_id = ?", events.StaffID).Exec(ctx)
 	return err
 }
 
