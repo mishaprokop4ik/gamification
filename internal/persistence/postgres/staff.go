@@ -45,7 +45,7 @@ func (s *StaffRepo) SaveFile(ctx context.Context, image models.StaffImage) error
 	if err != nil {
 		return err
 	}
-	return err
+	return tx.Commit()
 }
 
 func (s *StaffRepo) CreateStaffUser(ctx context.Context, staff *models.StaffSignUp) (uuid.UUID, error) {

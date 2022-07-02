@@ -373,14 +373,18 @@ func (h *Handler) UploadImage(c *gin.Context) {
 			"there is no userID in context")
 		return
 	}
-	file, _ := c.FormFile("file")
+	file, err := c.FormFile("file")
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 	if filepath.Ext(file.Filename) != ".png" {
 		newErrorResponse(c, http.StatusBadRequest,
 			fmt.Sprintf("this format is unsupported: %s; want: png", filepath.Ext(file.Filename)))
 		return
 	}
 	dst := fmt.Sprintf("%s/%s", imagePath, file.Filename)
-	err := c.SaveUploadedFile(file, dst)
+	err = c.SaveUploadedFile(file, dst)
 	if err != nil {
 		_ = os.Remove(dst)
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
