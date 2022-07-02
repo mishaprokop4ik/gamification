@@ -39,6 +39,18 @@ func (h *Handler) GetAllOrganizations(c *gin.Context) {
 		return
 	}
 
+	staff, err := h.Service.Staff.GetStaff(ctx, userID.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get staff by id: %s", err).Error())
+		return
+	}
+
+	if !staff.HasPermission(models.OrganizationGetAll) {
+		newErrorResponse(c, http.StatusForbidden,
+			"no access to this action")
+		return
+	}
+
 	organizations, err := h.Service.Organization.GetOrganizations(ctx)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())

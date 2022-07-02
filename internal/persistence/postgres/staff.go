@@ -41,7 +41,7 @@ func (s *StaffRepo) SaveFile(ctx context.Context, image models.StaffImage) error
 	if err != nil {
 		return err
 	}
-	_, err = tx.NewUpdate().Model(&models.Staff{}).OmitZero().Set("current_image = ?", image.ImagePath).Exec(ctx)
+	_, err = tx.NewUpdate().Model(&models.Staff{}).OmitZero().Set("current_image = ?", image.ImagePath).Where("id = ?", image.UserID).Exec(ctx)
 	if err != nil {
 		return err
 	}
