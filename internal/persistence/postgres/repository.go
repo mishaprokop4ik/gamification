@@ -242,5 +242,6 @@ type Event interface {
 	GetEventsByCommandID(ctx context.Context, commandID uuid.UUID) ([]*models.Event, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 	UpdateEvent(ctx context.Context, step *models.Event) error
-	GetStaffsEvents(ctx context.Context, id uuid.UUID, role string) ([]*models.Event, error)
+	GetStaffsEventsByRole(ctx context.Context, id uuid.UUID, role string) ([]*models.Event, error)
+	GetStaffsEvents(ctx context.Context, id uuid.UUID) ([]*models.Event, error)
 }

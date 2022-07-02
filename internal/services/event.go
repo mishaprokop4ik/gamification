@@ -115,8 +115,13 @@ func (e *EventService) UpdateEvent(ctx context.Context, event *models.Event) err
 	return e.repo.UpdateEvent(ctx, event)
 }
 
-func (e *EventService) GetStaffsEvents(ctx context.Context, id uuid.UUID, role string) ([]*models.Event, error) {
-	return e.repo.GetStaffsEvents(ctx, id, role)
+func (e *EventService) GetStaffsEventsByRole(ctx context.Context, id uuid.UUID,
+	role string) ([]*models.Event, error) {
+	return e.repo.GetStaffsEventsByRole(ctx, id, role)
+}
+
+func (e *EventService) GetStaffsEvents(ctx context.Context, id uuid.UUID) ([]*models.Event, error) {
+	return e.repo.GetStaffsEvents(ctx, id)
 }
 
 func NewEventService(ctx context.Context, repo postgres.Event) *EventService {

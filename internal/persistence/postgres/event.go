@@ -14,6 +14,12 @@ type EventRepo struct {
 	ctx context.Context
 }
 
+func (e *EventRepo) GetStaffsEvents(ctx context.Context, id uuid.UUID) ([]*models.Event, error) {
+	events := new([]*models.Event)
+	err := e.DB.NewSelect().Model(events).Scan(ctx)
+	return *events, err
+}
+
 func (e *EventRepo) DeleteInvitation(ctx context.Context, events models.StaffEvents) error {
 	_, err := e.DB.NewDelete().Model(&events).
 		Where("event_id = ?", events.EventID).Where("user_id = ?", events.StaffID).Exec(ctx)
@@ -242,7 +248,7 @@ func (e *EventRepo) UpdateEvent(ctx context.Context, event *models.Event) error 
 	return nil
 }
 
-func (e *EventRepo) GetStaffsEvents(ctx context.Context, id uuid.UUID, role string) ([]*models.Event, error) {
+func (e *EventRepo) GetStaffsEventsByRole(ctx context.Context, id uuid.UUID, role string) ([]*models.Event, error) {
 	var staffEvents = new([]*models.StaffEvents)
 
 	err := e.DB.NewSelect().Model(staffEvents).

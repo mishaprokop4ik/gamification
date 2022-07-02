@@ -112,7 +112,8 @@ type Event interface {
 	GetStaffScore(ctx context.Context, eventID, staffID uuid.UUID) (models.StaffScore, error)
 	DeleteEvent(ctx context.Context, id uuid.UUID) error
 	UpdateEvent(ctx context.Context, step *models.Event) error
-	GetStaffsEvents(ctx context.Context, id uuid.UUID, role string) ([]*models.Event, error)
+	GetStaffsEventsByRole(ctx context.Context, id uuid.UUID, role string) ([]*models.Event, error)
+	GetStaffsEvents(ctx context.Context, id uuid.UUID) ([]*models.Event, error)
 }
 
 func NewService(r *postgres.Repository) *Service {

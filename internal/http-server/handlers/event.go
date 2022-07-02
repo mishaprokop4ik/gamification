@@ -10,6 +10,37 @@ import (
 	"time"
 )
 
+func (h *Handler) GetEvents(c *gin.Context) {
+	ctx := context.Background()
+	id, ok := c.Get("userID")
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError,
+			"there is no userID in context")
+		return
+	}
+
+	user, err := h.Service.Staff.GetStaff(ctx, id.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("can not get staff by id; err: %s;", err.Error()))
+		return
+	}
+	if !user.Position.HasPermission(models.EventGetAll) {
+		newErrorResponse(c, http.StatusForbidden, "")
+		return
+	}
+
+	events, err := h.Service.Event.GetStaffsEvents(ctx, id.(uuid.UUID))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError,
+			fmt.Errorf("can not get events by staff role: %s", err).Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"events": events,
+	})
+}
+
 // GetUserEvents
 // @Summary Get Events where staff takes a part by role
 // @Security ApiKeyAuth
@@ -44,7 +75,7 @@ func (h *Handler) GetUserEvents(c *gin.Context) {
 
 	staffRole := c.Param("role")
 
-	events, err := h.Service.Event.GetStaffsEvents(ctx, id.(uuid.UUID), staffRole)
+	events, err := h.Service.Event.GetStaffsEventsByRole(ctx, id.(uuid.UUID), staffRole)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError,
 			fmt.Errorf("can not get events by staff role: %s", err).Error())
@@ -231,6 +262,13 @@ func (h *Handler) AssignStaffToEvent(c *gin.Context) {
 	if err := c.Bind(&staffEvents); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("can not get input: %s", err).Error())
 		return
+	}
+	for i := range staffEvents {
+		if staffEvents[i].StaffID == staff.ID {
+			staffEvents[i] = staffEvents[len(staffEvents)-1]
+			staffEvents[len(staffEvents)-1] = models.StaffEvents{}
+			staffEvents = staffEvents[:len(staffEvents)-1]
+		}
 	}
 	err = h.Service.Event.AssignStaff(ctx, staffEvents, id)
 	if err != nil {

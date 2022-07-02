@@ -25,7 +25,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{http.MethodPost, http.MethodGet, http.MethodPut, http.MethodDelete, http.MethodOptions},
-		AllowHeaders:     []string{"Origin"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Access-Control-Allow-Origin"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -98,6 +98,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		event := api.Group("/event")
 		{
 			event.POST("/", h.CreateEvent) // ads
+			event.GET("/all", h.GetEvents) // ads
 			event.POST("/invite/:id", h.AssignStaffToEvent)
 			event.POST("/invitation/:id", h.AnswerInvitation) // ads
 			event.GET("/invitation/", h.GetInvitations)       // ads
