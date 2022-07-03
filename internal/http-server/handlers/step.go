@@ -74,7 +74,7 @@ func (h *Handler) CreateStep(c *gin.Context) {
 			step.Prizes[i].ID = uuid.New()
 			step.Prizes[i].StepID = step.ID
 			step.Prizes[i].CreatedBy = userID.(uuid.UUID)
-			if step.Prizes[i].Count >= 0 {
+			if step.Prizes[i].Count <= 0 {
 				newErrorResponse(c, http.StatusBadRequest, fmt.Sprintf("incorrent count: %d", step.Prizes[i].Count))
 				return
 			}
