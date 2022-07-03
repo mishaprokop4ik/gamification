@@ -196,12 +196,13 @@ func (u *Staff) HasOneOfPermissions(perms ...PermissionName) bool {
 }
 
 type StaffInfo struct {
-	FirstName       string `json:"first_name"`
-	LastName        string `json:"last_name"`
-	BackgroundColor string `json:"background_color"`
-	TextColor       string `json:"text_color"`
-	CompanyName     string `json:"company_name"`
-	Position        string `json:"position"`
+	ID              uuid.UUID `json:"id"`
+	FirstName       string    `json:"first_name"`
+	LastName        string    `json:"last_name"`
+	BackgroundColor string    `json:"background_color"`
+	TextColor       string    `json:"text_color"`
+	CompanyName     string    `json:"company_name"`
+	Position        string    `json:"position"`
 }
 
 type InviteStatus string

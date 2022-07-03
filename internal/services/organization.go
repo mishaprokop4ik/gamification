@@ -84,6 +84,7 @@ func (o *OrganizationService) GetOrganizationStaff(ctx context.Context, orgID uu
 	var responseStaff = make([]models.StaffInfo, len(staff))
 	for i := 0; i < len(staff); i++ {
 		responseStaff[i] = models.StaffInfo{
+			ID:              staff[i].ID,
 			FirstName:       staff[i].FirstName,
 			LastName:        staff[i].LastName,
 			BackgroundColor: string(staff[i].BackgroundColor),
