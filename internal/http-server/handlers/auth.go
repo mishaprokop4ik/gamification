@@ -164,14 +164,15 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	token, id, err := h.Service.Auth.GenerateToken(input.Email, input.Password)
+	token, id, orgID, err := h.Service.Auth.GenerateToken(input.Email, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
-		"id":    id,
+		"token":           token,
+		"id":              id,
+		"organization_id": orgID,
 	})
 }
